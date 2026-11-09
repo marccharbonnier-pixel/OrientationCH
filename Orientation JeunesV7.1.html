@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Boussole v7.1 — Explorer les chemins de la formation en Suisse</title>
+<style>
+:root{--primary:#1a5f7a;--primary-dark:#0e3f52;--swiss:#d52b1e;--bg:#f4f7f9;--surface:#fff;--text:#1a202c;--muted:#64748b;--border:#e2e8f0;--shadow:0 4px 24px rgba(0,0,0,.08);--radius:14px;--success:#2e7d32;--warn:#ef6c00;--danger:#c62828;--teal:#00897b;--academic:#5e35b1;--cross:#c2185b;--vae:#00695c;--transition:#d84315}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;display:flex;flex-direction:column;min-height:100vh;-webkit-font-smoothing:antialiased}
+header.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.1rem;color:var(--primary)}
+.compass{width:24px;height:24px;border-radius:50%;border:2px solid var(--primary);position:relative;flex-shrink:0}
+.compass::before{content:'';position:absolute;top:2px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:8px solid var(--swiss)}
+.compass::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:8px solid var(--primary)}
+.lang-toggle{display:flex;background:var(--bg);border-radius:8px;padding:3px;gap:2px}
+.lang-toggle button{border:none;background:transparent;padding:6px 12px;border-radius:6px;font-weight:600;font-size:.85rem;color:var(--muted);cursor:pointer;font-family:inherit}
+.lang-toggle button.active{background:var(--surface);color:var(--primary);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+main{flex:1;width:100%;max-width:900px;margin:0 auto;padding:24px 20px 48px}
+.card{background:var(--surface);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow);animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+h1{font-size:1.55rem;color:var(--primary);margin-bottom:10px;line-height:1.3}
+h2{font-size:1.15rem;color:var(--primary);margin:22px 0 12px}
+h3{font-size:1rem;color:var(--primary);margin:16px 0 8px}
+p{margin-bottom:14px}.lead{font-size:1rem;color:var(--muted);margin-bottom:22px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 26px;border-radius:10px;border:none;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;line-height:1.2}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px)}
+.btn-secondary{background:var(--bg);color:var(--text);border:1px solid var(--border)}.btn-secondary:hover{background:#eaf0f4}
+.btn-block{width:100%}.actions{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+.info-box{background:#eaf4f8;border-left:4px solid var(--primary);border-radius:8px;padding:14px 18px;margin:20px 0;font-size:.92rem}
+.warning-box{background:#fff8e1;border-left:4px solid var(--warn);border-radius:8px;padding:14px 18px;margin:20px 0;font-size:.88rem}
+.academic-box{background:#f3e5f5;border-left:4px solid var(--academic);border-radius:8px;padding:14px 18px;margin:20px 0;font-size:.9rem}
+.cross-box{background:#fce4ec;border-left:4px solid var(--cross);border-radius:8px;padding:16px 18px;margin:20px 0;font-size:.9rem}
+.polarization-box{background:#e8f5e9;border-left:4px solid var(--success);border-radius:8px;padding:14px 18px;margin:20px 0;font-size:.9rem}
+.context-box{background:#fff3e0;border-left:4px solid var(--warn);border-radius:8px;padding:14px 18px;margin:20px 0;font-size:.9rem}
+.vae-box{background:#e0f2f1;border-left:4px solid var(--vae);border-radius:8px;padding:16px 18px;margin:20px 0;font-size:.9rem}
+.transition-box{background:#fbe9e7;border-left:4px solid var(--transition);border-radius:8px;padding:20px 22px;margin:20px 0;font-size:.95rem}
+.transition-box h3{color:var(--transition);margin-top:0}
+.recommendation{background:#fff;border:1px solid var(--border);border-left:4px solid var(--primary);border-radius:8px;padding:14px 18px;margin:10px 0}
+.recommendation-num{display:inline-block;width:26px;height:26px;border-radius:50%;background:var(--primary);color:#fff;text-align:center;line-height:26px;font-weight:700;font-size:.85rem;margin-right:8px}
+.recommendation-title{font-weight:700;color:var(--text);display:inline}
+.recommendation-desc{font-size:.9rem;color:var(--muted);margin-top:6px;margin-left:34px}
+.orp-box{background:#e3f2fd;border-left:4px solid #1565c0;border-radius:8px;padding:16px 18px;margin:20px 0;font-size:.9rem}
+.orp-box strong{color:#0d47a1}
+.dont-box{background:#fafafa;border-left:4px solid #9e9e9e;border-radius:8px;padding:14px 18px;margin:20px 0;font-size:.88rem;color:var(--muted)}
+.adult-path{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:14px}
+.adult-path-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.adult-path-title{font-weight:700;font-size:1rem;color:var(--text)}
+.adult-path-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;font-size:.85rem;margin-top:8px}
+.adult-path-item .adult-path-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:2px}
+.adult-path-item .adult-path-value{color:var(--text);line-height:1.4}
+ul{padding-left:22px;margin:10px 0 16px}li{margin-bottom:6px}
+.progress-wrap{margin-bottom:22px}
+.progress-meta{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-bottom:8px;font-weight:500}
+.progress-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),#2a7f9a);border-radius:4px;transition:width .35s ease}
+.progress-fill.int{background:linear-gradient(90deg,var(--teal),#26a69a)}
+.question-num{font-size:.82rem;font-weight:600;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:14px}
+.question-num.int{color:var(--teal)}
+.question-text{font-size:1.35rem;font-weight:600;line-height:1.4;margin-bottom:8px;min-height:3.5em;word-wrap:break-word}
+.question-hint{font-size:.85rem;color:var(--muted);margin-bottom:22px;font-style:italic}
+.likert{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.likert-option{display:flex;align-items:center;gap:14px;padding:14px 18px;border:2px solid var(--border);border-radius:10px;background:var(--surface);cursor:pointer;transition:all .15s;font-size:1rem;text-align:left;width:100%;font-family:inherit;color:var(--text)}
+.likert-option:hover{border-color:var(--primary);background:#f0f7fa}
+.likert-option.selected{border-color:var(--primary);background:#d9ebf1;font-weight:600}
+.likert-option .dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;transition:all .15s;position:relative}
+.likert-option.selected .dot{border-color:var(--primary);background:var(--primary)}
+.likert-option.selected .dot::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:8px;height:8px;background:#fff;border-radius:50%}
+.scale-preview{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:14px 0}
+.scale-row{display:flex;align-items:center;gap:14px;padding:11px 18px;border-bottom:1px solid var(--border);background:var(--bg);font-size:.95rem}
+.scale-row:last-child{border-bottom:none}
+.scale-num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--primary);color:#fff;font-weight:700;font-size:.85rem;flex-shrink:0}
+.form-group{margin-bottom:22px}
+.form-label{display:block;font-size:.9rem;font-weight:700;color:var(--primary);margin-bottom:10px}
+.form-hint{font-size:.82rem;color:var(--muted);margin-bottom:10px;font-style:italic}
+.form-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.form-option{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border:2px solid var(--border);border-radius:10px;background:var(--surface);cursor:pointer;transition:all .15s;font-size:.92rem;font-family:inherit;color:var(--text);text-align:left}
+.form-option:hover{border-color:var(--primary);background:#f0f7fa}
+.form-option.selected{border-color:var(--primary);background:#d9ebf1;font-weight:600}
+.form-check{width:20px;height:20px;border-radius:4px;border:2px solid var(--border);flex-shrink:0;position:relative;transition:all .15s}
+.form-option.selected .form-check{border-color:var(--primary);background:var(--primary)}
+.form-option.selected .form-check::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:.75rem;font-weight:800}
+.axis-row{background:var(--bg);padding:16px;border-radius:10px;margin-bottom:14px}
+.axis-title{font-size:.9rem;font-weight:600;color:var(--muted);margin-bottom:10px}
+.axis-bar{position:relative;height:12px;background:linear-gradient(90deg,#c62828 0%,#e0e0e0 50%,#1a5f7a 100%);border-radius:6px;margin:14px 0 6px}
+.axis-dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--text);box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.axis-labels{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);font-weight:600}
+.axis-value{text-align:center;font-size:.9rem;font-weight:700;margin-top:8px;color:var(--text)}
+.territory{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden;transition:all .2s}
+.territory.primary{border-width:2px;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.territory.excluded{opacity:.55;border-style:dashed}
+.territory-header{padding:18px 20px;display:flex;align-items:center;gap:14px;background:var(--bg);border-bottom:1px solid var(--border)}
+.territory.primary .territory-header{background:linear-gradient(135deg,#eaf4f8,#d9ebf1)}
+.territory.excluded .territory-header{background:#fafafa}
+.territory-badge{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.1rem;flex-shrink:0}
+.territory.excluded .territory-badge{filter:grayscale(.7)}
+.territory-info{flex:1}
+.territory-name{font-weight:700;font-size:1.05rem;color:var(--text);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.territory-score{font-size:.85rem;color:var(--muted);margin-top:2px}
+.territory-why{font-size:.85rem;color:var(--muted);margin-top:4px;font-style:italic}
+.territory-content{padding:0}
+.territory-content.collapsed{display:none}
+.excluded-badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;background:#ffebee;color:var(--danger)}
+.path-group-header{padding:12px 20px;background:#f7fafc;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:1px solid var(--border)}
+.path-group-header.direct{background:#e8f5e9;color:var(--success)}
+.path-group-header.transition{background:#fff3e0;color:var(--warn)}
+.path-group-header.academic{background:#ede7f6;color:var(--academic)}
+.path-group-header.not-relevant{background:#eeeeee;color:var(--muted)}
+.path-group-header.duration-blocked,.path-group-header.finance-blocked,.path-group-header.region-blocked{background:#ffebee;color:var(--danger)}
+.path-card{padding:16px 20px;border-bottom:1px solid var(--border)}
+.path-card:last-child{border-bottom:none}
+.path-card.path-direct{border-left:3px solid var(--success)}
+.path-card.path-transition{border-left:3px solid var(--warn)}
+.path-card.path-academic{border-left:3px solid var(--academic)}
+.path-card.path-not-relevant{opacity:.6;border-left:3px solid #bdbdbd}
+.path-card.path-duration-blocked,.path-card.path-finance-blocked,.path-card.path-region-blocked{opacity:.7;border-left:3px solid var(--danger);background:#fffafa}
+.path-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.path-level{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.level-afp{background:#fff3e0;color:#e65100}
+.level-cfc{background:#e3f2fd;color:#1565c0}
+.level-es{background:#e8f5e9;color:#2e7d32}
+.level-hes{background:#f3e5f5;color:#6a1b9a}
+.level-uni{background:#ede7f6;color:#4527a0}
+.level-epf{background:#e0f2f1;color:#00695c}
+.level-brevet{background:#fff8e1;color:#ef6c00}
+.path-title{font-weight:600;font-size:.95rem}
+.path-meta{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px;font-size:.76rem}
+.path-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-weight:700}
+.badge-paid{background:#e8f5e9;color:#2e7d32}
+.badge-salary{background:#e3f2fd;color:#1565c0}
+.badge-unpaid{background:#fff3e0;color:#e65100}
+.badge-accessible{background:#e8f5e9;color:#2e7d32}
+.badge-modere{background:#fff8e1;color:#ef6c00}
+.badge-selectif{background:#ffebee;color:#c62828}
+.badge-permis{background:#f3e5f5;color:#6a1b9a}
+.badge-bilingue{background:#e0f2f1;color:#00695c}
+.mp-note{margin-top:6px;padding:6px 10px;background:#f0f4ff;border-left:3px solid #5e35b1;border-radius:4px;font-size:.78rem;color:#4527a0}
+.path-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;font-size:.85rem;margin-top:8px}
+.path-item .path-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:2px}
+.path-item .path-value{color:var(--text);line-height:1.4}
+.path-warning{margin-top:8px;padding:8px 12px;background:#fff8e1;border-left:3px solid var(--warn);border-radius:6px;font-size:.82rem;color:#8b5a00}
+.path-warning.danger{background:#ffebee;border-left-color:var(--danger);color:var(--danger)}
+.path-warning.info{background:#e3f2fd;border-left-color:#1565c0;color:#0d47a1}
+.expand-toggle{text-align:center;padding:16px;background:var(--bg);border-radius:10px;margin-top:20px;cursor:pointer;font-weight:600;color:var(--primary);font-size:.9rem;border:1px dashed var(--border)}
+.expand-toggle:hover{background:#eaf0f4}
+.cross-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+.cross-item{padding:12px 14px;background:#fff;border-radius:8px;border:1px solid #f8bbd0}
+.cross-item-title{font-weight:700;font-size:.92rem;color:var(--cross);margin-bottom:4px}
+.cross-item-desc{font-size:.85rem;color:var(--text);line-height:1.4}
+footer{text-align:center;padding:18px;font-size:.78rem;color:var(--muted);border-top:1px solid var(--border);background:var(--surface)}
+@media(max-width:600px){main{padding:16px 12px 32px}.card{padding:22px 18px}h1{font-size:1.3rem}.question-text{font-size:1.1rem;min-height:4em}.path-grid,.adult-path-grid{grid-template-columns:1fr}.territory-header{padding:14px 16px}.path-card{padding:14px 16px}.form-options{grid-template-columns:1fr}}
+@media print{header,footer,.actions,.btn,.progress-wrap,.expand-toggle{display:none!important}body{background:#fff}.card{box-shadow:none;padding:0}.territory-content.collapsed{display:block!important}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><div class="compass" aria-hidden="true"></div><span>Boussole</span></div>
+  <div class="lang-toggle" role="group">
+    <button type="button" data-action="set-lang" data-lang="fr" id="btn-lang-fr">FR</button>
+    <button type="button" data-action="set-lang" data-lang="de" id="btn-lang-de">DE</button>
+  </div>
+</header>
+<main id="app" aria-live="polite"></main>
+<footer><span id="footer-text"></span></footer>
+
+<script>
+"use strict";
+
+/* ========== AXES ========== */
+const AXIS_ITEMS = [
+  {axis:'PT',pole:'P',fr:"J'aime être en contact direct avec des personnes",de:"Ich bin gerne in direktem Kontakt mit Menschen"},
+  {axis:'PT',pole:'P',fr:"Discuter, échanger, créer du lien me stimule",de:"Diskutieren, austauschen, Beziehungen aufbauen stimuliert mich"},
+  {axis:'PT',pole:'T',fr:"Je préfère travailler avec des objets, des machines ou des outils",de:"Ich arbeite lieber mit Objekten, Maschinen oder Werkzeugen"},
+  {axis:'PT',pole:'T',fr:"Je suis plus à l'aise avec la matière qu'avec les gens",de:"Ich bin mit Materie vertrauter als mit Menschen"},
+  {axis:'DI',pole:'D',fr:"Analyser des chiffres, des faits, des données me plaît",de:"Zahlen, Fakten und Daten zu analysieren gefällt mir"},
+  {axis:'DI',pole:'D',fr:"Je préfère les raisonnements concrets et vérifiables",de:"Ich bevorzuge konkrete und überprüfbare Argumente"},
+  {axis:'DI',pole:'I',fr:"J'aime explorer des concepts abstraits et théoriques",de:"Ich erkunde gerne abstrakte und theoretische Konzepte"},
+  {axis:'DI',pole:'I',fr:"Imaginer, inventer, créer de nouvelles idées me motive",de:"Vorstellen, erfinden, neue Ideen schaffen motiviert mich"}
+];
+
+const INTERESTS = {
+  soin_somatique:{fr:"Soin somatique",de:"Körperpflege"},soin_psychique:{fr:"Soin psychique",de:"Psychische Betreuung"},
+  accompagnement:{fr:"Accompagnement",de:"Begleitung"},enseignement:{fr:"Enseignement",de:"Lehre"},
+  analyse_quantitative:{fr:"Analyse quantitative",de:"Quantitative Analyse"},numerique:{fr:"Numérique",de:"Digitales"},
+  mecanique:{fr:"Mécanique",de:"Mechanik"},construction:{fr:"Construction",de:"Bau"},
+  nature:{fr:"Nature",de:"Natur"},artisanat:{fr:"Artisanat",de:"Handwerk"},
+  creation_visuelle:{fr:"Création visuelle",de:"Visuelle Gestaltung"},expression:{fr:"Expression",de:"Ausdruck"},
+  leadership:{fr:"Leadership",de:"Führung"},organisation:{fr:"Organisation",de:"Organisation"},
+  commerce:{fr:"Commerce",de:"Handel"},securite:{fr:"Sécurité",de:"Sicherheit"}
+};
+
+const ITEMS_INT = [
+  ["soin_somatique","Prendre soin du corps des personnes","Den Körper von Menschen pflegen"],
+  ["soin_somatique","Effectuer des gestes médicaux précis","Präzise medizinische Handgriffe ausführen"],
+  ["soin_somatique","Veiller au confort physique de personnes dépendantes","Für das körperliche Wohlbefinden sorgen"],
+  ["soin_psychique","Rassurer une personne qui traverse une épreuve","Eine Person trösten"],
+  ["soin_psychique","Écouter sans juger les difficultés d'autrui","Ohne Urteil zuhören"],
+  ["soin_psychique","Comprendre les émotions et le vécu des personnes","Emotionen verstehen"],
+  ["accompagnement","Accompagner des personnes vers leur autonomie","Zur Autonomie begleiten"],
+  ["accompagnement","Aider quelqu'un à surmonter un obstacle","Helfen, ein Hindernis zu überwinden"],
+  ["accompagnement","Créer un lien de confiance avec des personnes fragiles","Vertrauensbeziehung aufbauen"],
+  ["enseignement","Expliquer une notion complexe de manière claire","Komplexes klar erklären"],
+  ["enseignement","Transmettre un savoir à un groupe","Wissen vermitteln"],
+  ["enseignement","Concevoir des activités pédagogiques","Pädagogische Aktivitäten gestalten"],
+  ["analyse_quantitative","Analyser des données chiffrées","Zahlen analysieren"],
+  ["analyse_quantitative","Résoudre des problèmes logiques ou mathématiques","Logische Probleme lösen"],
+  ["analyse_quantitative","Travailler avec des tableaux et statistiques","Mit Tabellen arbeiten"],
+  ["numerique","Comprendre comment fonctionne un ordinateur","Computer verstehen"],
+  ["numerique","Apprendre à programmer ou configurer","Programmieren lernen"],
+  ["numerique","Résoudre des problèmes techniques informatiques","IT-Probleme lösen"],
+  ["mecanique","Comprendre le fonctionnement d'une machine","Maschinen verstehen"],
+  ["mecanique","Réparer ou entretenir des équipements","Geräte reparieren"],
+  ["mecanique","Utiliser des outils de précision","Präzisionswerkzeuge verwenden"],
+  ["construction","Assembler, bâtir ou construire","Zusammenbauen oder errichten"],
+  ["construction","Travailler avec des matériaux","Mit Materialien arbeiten"],
+  ["construction","Lire des plans et les mettre en œuvre","Pläne lesen und umsetzen"],
+  ["nature","Travailler en plein air","Im Freien arbeiten"],
+  ["nature","Observer et comprendre le vivant","Lebewesen beobachten"],
+  ["nature","Prendre soin d'un jardin ou d'une forêt","Garten oder Wald pflegen"],
+  ["artisanat","Façonner un objet de mes mains","Objekt von Hand formen"],
+  ["artisanat","Travailler la matière avec précision","Material präzise bearbeiten"],
+  ["artisanat","Créer des pièces uniques ou sur mesure","Einzigartige Stücke schaffen"],
+  ["creation_visuelle","Créer une image qui attire l'œil","Ein auffälliges Bild schaffen"],
+  ["creation_visuelle","Dessiner, peindre, sculpter ou photographier","Zeichnen, malen, fotografieren"],
+  ["creation_visuelle","Concevoir des objets esthétiques","Ästhetische Objekte entwerfen"],
+  ["expression","Écrire un texte qui capte l'attention","Aufmerksamkeit weckenden Text schreiben"],
+  ["expression","Prendre la parole devant un public","Vor Publikum sprechen"],
+  ["expression","Convaincre par les mots","Mit Worten überzeugen"],
+  ["leadership","Diriger une équipe vers un objectif","Team zu Ziel führen"],
+  ["leadership","Prendre des décisions difficiles","Schwierige Entscheidungen treffen"],
+  ["leadership","Fédérer des personnes autour d'un projet","Menschen vereinen"],
+  ["organisation","Planifier un projet complexe","Komplexes Projekt planen"],
+  ["organisation","Classer, organiser, structurer","Informationen ordnen"],
+  ["organisation","Gérer un planning et des priorités","Zeitplan verwalten"],
+  ["commerce","Convaincre un client d'acheter","Kunden überzeugen"],
+  ["commerce","Négocier un accord ou un contrat","Verhandeln"],
+  ["commerce","Développer un réseau de contacts","Netzwerk aufbauen"],
+  ["securite","Intervenir en situation d'urgence","In Notsituationen eingreifen"],
+  ["securite","Protéger des personnes ou des biens","Menschen oder Güter schützen"],
+  ["securite","Faire respecter des règles","Regeln durchsetzen"]
+];
+
+/* ========== RÉGIONS CH ========== */
+const REGIONS = {
+  lemanique:{fr:"Arc lémanique (Lausanne, Genève, Vevey, Sion)",de:"Genferseebogen",langues:['fr']},
+  mittelland:{fr:"Mittelland (Berne, Bienne, Soleure, Fribourg)",de:"Mittelland",langues:['fr','de']},
+  zurich:{fr:"Zurich",de:"Zürich",langues:['de']},
+  nordouest:{fr:"Suisse du Nord-Ouest (Bâle)",de:"Nordwestschweiz",langues:['de']},
+  centrale:{fr:"Suisse centrale (Lucerne, Zoug)",de:"Zentralschweiz",langues:['de']},
+  oriental:{fr:"Suisse orientale (Saint-Gall, Coire)",de:"Ostschweiz",langues:['de']},
+  tessin:{fr:"Tessin (Lugano, Bellinzone)",de:"Tessin",langues:['it']}
+};
+
+/* ========== TERRITOIRES ========== */
+const TERRITOIRES = [
+  {id:'sante',nom:{fr:"Santé & Soins",de:"Gesundheit & Pflege"},color:"#c62828",letter:"S",
+    interets:{soin_somatique:3,soin_psychique:3,accompagnement:1},
+    croisements:['social'],exclusions:['soin','social','sante'],
+    voies:[
+      {niveau:'AFP',titre:{fr:"Assistant/e en soins et accompagnement",de:"Assistent/in Gesundheit EBA"},duree:{fr:"2 ans",de:"2 Jahre"},dureeAns:2,region:'suisse',prerequis:{fr:"Scolarité obligatoire",de:"Obligatorische Schulzeit"},passerelle:{fr:"2e année CFC",de:"2. Lehrjahr EFZ"},acces:'direct',langue:null},
+      {niveau:'CFC',titre:{fr:"Assistant/e en soins et santé communautaire",de:"Fachfrau/-mann Gesundheit EFZ"},duree:{fr:"3 ans (dual)",de:"3 Jahre (dual)"},dureeAns:3,region:'suisse',prerequis:{fr:"Contrat d'apprentissage",de:"Lehrvertrag"},passerelle:{fr:"ES soins infirmiers",de:"HF Pflege"},acces:'direct',langue:null,select:'modere'},
+      {niveau:'ES',titre:{fr:"Infirmier/ère ES",de:"Pflegefachfrau/-mann HF"},duree:{fr:"3 ans",de:"3 Jahre"},dureeAns:3,region:'suisse',prerequis:{fr:"CFC + expérience",de:"EFZ + Erfahrung"},passerelle:{fr:"HES soins infirmiers",de:"FH Pflege"},acces:'transition',langue:null},
+      {niveau:'HES',titre:{fr:"Soins infirmiers HES",de:"Pflege FH"},duree:{fr:"3 ans (Bachelor)",de:"3 Jahre (Bachelor)"},dureeAns:3,region:'suisse',prerequis:{fr:"CFC + maturité",de:"EFZ + Matura"},passerelle:{fr:"Master",de:"Master"},acces:'transition',langue:null},
+      {niveau:'UNI',titre:{fr:"Médecine, Pharmacie, Médecine dentaire",de:"Medizin, Pharmazie, Zahnmedizin"},duree:{fr:"6 ans",de:"6 Jahre"},dureeAns:6,region:'suisse',prerequis:{fr:"Maturité gymnasiale",de:"Gymnasiale Matura"},passerelle:{fr:"Numerus clausus",de:"Numerus clausus"},acces:'academic',langue:null}
+    ]},
+  {id:'technique',nom:{fr:"Technique & Industrie",de:"Technik & Industrie"},color:"#1565c0",letter:"T",
+    interets:{mecanique:3,construction:1,analyse_quantitative:1},
+    croisements:['numerique','artisanat'],exclusions:['artisanat'],
+    voies:[
+      {niveau:'AFP',titre:{fr:"Aide en maintenance industrielle",de:"Industrieunterhalts-Assistent/in EBA"},duree:{fr:"2 ans",de:"2 Jahre"},dureeAns:2,region:'suisse',prerequis:{fr:"Scolarité obligatoire",de:"Obligatorische Schulzeit"},passerelle:{fr:"CFC correspondant",de:"Entsprechende EFZ"},acces:'direct',langue:null},
+      {niveau:'CFC',titre:{fr:"Polymécanicien/ne, Électricien/ne, Automaticien/ne",de:"Polymechaniker/in, Elektriker/in, Automatiker/in EFZ"},duree:{fr:"3–4 ans (dual)",de:"3–4 Jahre (dual)"},dureeAns:4,region:'suisse',prerequis:{fr:"Contrat d'apprentissage",de:"Lehrvertrag"},passerelle:{fr:"ES technique ou HES",de:"HF Technik oder FH"},acces:'direct',langue:null,select:'modere',permis:true},
+      {niveau:'ES',titre:{fr:"Technicien/ne ES en automation",de:"Automationstechniker/in HF"},duree:{fr:"2–3 ans",de:"2–3 Jahre"},dureeAns:3,region:'suisse',prerequis:{fr:"CFC + expérience",de:"EFZ + Erfahrung"},passerelle:{fr:"HES ingénierie",de:"FH Ingenieurwesen"},acces:'transition',langue:null},
+      {niveau:'HES',titre:{fr:"Ingénieur/e HES génie mécanique ou électrique",de:"Ingenieur/in FH Maschinenbau oder Elektrotechnik"},duree:{fr:"3 ans (Bachelor)",de:"3 Jahre (Bachelor)"},dureeAns:3,region:'suisse',prerequis:{fr:"CFC + MP ou maturité",de:"EFZ + BM oder Matura"},passerelle:{fr:"Master EPF/HES",de:"Master ETH/FH"},acces:'transition',langue:'fr'},
+      {niveau:'EPF',titre:{fr:"Ingénierie EPFL/ETHZ",de:"Ingenieurwesen EPFL/ETHZ"},duree:{fr:"3+2 ans",de:"3+2 Jahre"},dureeAns:5,region:'suisse',prerequis:{fr:"Maturité ou Passerelle",de:"Matura oder Passerelle"},passerelle:{fr:"Accès direct. EPFL : CMS pour MP.",de:"Direkt. EPFL: CMS für BM."},acces:'academic',langue:'mixed'}
+    ]},
+  {id:'nature',nom:{fr:"Nature & Environnement",de:"Natur & Umwelt"},color:"#2e7d32",letter:"N",
+    interets:{nature:3,artisanat:1,construction:1},
+    croisements:['technique','artisanat'],exclusions:['nature'],
+    voies:[
+      {niveau:'CFC',titre:{fr:"Horticulteur/trice, Agriculteur/trice, Forestier/ère",de:"Gärtner/in, Landwirt/in, Forstwart/in EFZ"},duree:{fr:"3 ans",de:"3 Jahre"},dureeAns:3,region:'suisse',prerequis:{fr:"Contrat d'apprentissage",de:"Lehrvertrag"},passerelle:{fr:"ES ou brevet",de:"HF oder Fachausweis"},acces:'direct',langue:null,select:'accessible',permis:true},
+      {niveau:'ES',titre:{fr:"Forestier/ère ES",de:"Förster/in HF"},duree:{fr:"2–3 ans",de:"2–3 Jahre"},dureeAns:3,region:'suisse',prerequis:{fr:"CFC + expérience",de:"EFZ + Erfahrung"},passerelle:{fr:"HES environnement",de:"FH Umwelt"},acces:'transition',langue:null,permis:true},
+      {niveau:'HES',titre:{fr:"Agronome HES ou Ingénieur/e HES en environnement",de:"Agronom/in FH oder Umweltingenieur/in FH"},duree:{fr:"3 ans",de:"3 Jahre"},dureeAns:3,region:'suisse',prerequis:{fr:"CFC + MP ou maturité",de:"EFZ + BM oder Matura"},passerelle:{fr:"Master, recherche",de:"Master, Forschung"},acces:'transition',langue:'fr'},
+      {niveau:'UNI',titre:{fr:"Biologie, Géologie, Sciences de l'environnement",de:"Biologie, Geologie, Umweltwissenschaften"},duree:{fr:"3+2 ans",de:"3+2 Jahre"},dureeAns:5,region:'suisse',prerequis:{fr:"Maturité ou Passerelle",de:"Matura oder Passerelle"},passerelle:{fr:"Accès direct",de:"Direkt"},acces:'academic',langue:'fr'},
+      {niveau:'Brevet',titre:{fr:"Maître horticulteur/trice ou agriculteur/trice",de:"Gärtnermeister/in oder Landwirtschaftsmeister/in"},duree:{fr:"2 ans en cours d'emploi",de:"2 Jahre berufsbegleitend"},dureeAns:2,region:'suisse',prerequis:{fr:"CFC + pratique",de:"EFZ + Praxis"},passerelle:{fr:"Direction d'exploitation",de:"Betriebsleitung"},acces:'transition',langue:null}
+    ]},
+  {id:'creation',nom:{fr:"Création & Communication",de:"Gestaltung & Kommunikation"},color:"#7b1fa2",letter:"C",
+    interets:{creation_visuelle:3,expression:2,artisanat:1},
+    croisements:['social','commerce','numerique'],exclusions:[],
+    voies:[
+      {niveau:'CFC',titre:{fr:"Graphiste, Photographe, Interactive Media Designer",de:"Grafiker/in, Fotograf/in, Interactive Media Designer EFZ"},duree:{fr:"4 ans",de:"4 Jahre"},dureeAns:4,region:'suisse',prerequis:{fr:"Contrat + dossier",de:"Lehrvertrag + Portfolio"},passerelle:{fr:"ES design ou HES",de:"HF Design oder FH"},acces:'direct',langue:null,select:'selectif'},
+      {niveau:'ES',titre:{fr:"Designer ES en communication visuelle",de:"Designer/in HF Visuelle Kommunikation"},duree:{fr:"2–3 ans",de:"2–3 Jahre"},dureeAns:3,region:'lemanique',prerequis:{fr:"CFC + expérience + dossier",de:"EFZ + Erfahrung + Portfolio"},passerelle:{fr:"HES design",de:"FH Design"},acces:'transition',langue:null},
+      {niveau:'HES',titre:{fr:"Bachelor en design visuel ou communication visuelle",de:"Bachelor Visuelles Design"},duree:{fr:"3 ans",de:"3 Jahre"},dureeAns:3,region:'lemanique',prerequis:{fr:"CFC + MP ou maturité + dossier",de:"EFZ + BM oder Matura + Portfolio"},passerelle:{fr:"Master design",de:"Master Design"},acces:'transition',langue:'fr'},
+      {niveau:'UNI',titre:{fr:"Lettres, Histoire de l'art, Philosophie",de:"Geisteswissenschaften, Kunstgeschichte"},duree:{fr:"3+2 ans",de:"3+2 Jahre"},dureeAns:5,region:'suisse',prerequis:{fr:"Maturité ou Passerelle",de:"Matura oder Passerelle"},passerelle:{fr:"Accès direct",de:"Direkt"},acces:'academic',langue:'fr'}
+    ]},
+  {id:'commerce',nom:{fr:"Commerce & Gestion",de:"Handel & Management"},color:"#f9a825",letter:"G",
+    interets:{commerce:3,leadership:2,organisation:2},
+    croisements:['numerique','creation'],exclusions:['commerce'],
+    voies:[
+      {niveau:'CFC',titre:{fr:"Employé/e de commerce",de:"Kaufmann/-frau EFZ"},duree:{fr:"3 ans",de:"3 Jahre"},dureeAns:3,region:'suisse',prerequis:{fr:"Contrat d'apprentissage",de:"Lehrvertrag"},passerelle:{fr:"ES gestion ou HES",de:"HF Betriebswirtschaft oder FH"},acces:'direct',langue:null,select:'selectif'},
+      {niveau:'ES',titre:{fr:"Gestionnaire ES en entreprise",de:"Betriebswirtschafter/in HF"},duree:{fr:"2–3 ans",de:"2–3 Jahre"},dureeAns:3,region:'suisse',prerequis:{fr:"CFC + expérience",de:"EFZ + Erfahrung"},passerelle:{fr:"HES économie",de:"FH Betriebsökonomie"},acces:'transition',langue:null},
+      {niveau:'HES',titre:{fr:"Bachelor en économie d'entreprise",de:"Bachelor Betriebsökonomie"},duree:{fr:"3 ans",de:"3 Jahre"},dureeAns:3,region:'suisse',prerequis:{fr:"CFC + MP, maturité ou passerelle",de:"EFZ + BM, Matura oder Passerelle"},passerelle:{fr:"Master",de:"Master"},acces:'transition',langue:'fr'},
+      {niveau:'UNI',titre:{fr:"Sciences économiques, Management",de:"Wirtschaftswissenschaften, Management"},duree:{fr:"3+2 ans",de:"3+2 Jahre"},dureeAns:5,region:'suisse',prerequis:{fr:"Maturité ou Passerelle",de:"Matura oder Passerelle"},passerelle:{fr:"Accès direct",de:"Direkt"},acces:'academic',langue:'fr'}
+    ]},
+  {id:'social',nom:{fr:"Social & Éducation",de:"Soziales & Bildung"},color:"#ef6c00",letter:"So",
+    interets:{accompagnement:2,enseignement:2,soin_psychique:1},
+    croisements:['sante','creation'],exclusions:['social','enseignement','contact_difficulte'],
+    voies:[
+      {niveau:'AFP',titre:{fr:"Assistant/e socio-éducatif/ve",de:"Sozialpädagogische/r Assistent/in EBA"},duree:{fr:"2 ans",de:"2 Jahre"},dureeAns:2,region:'suisse',prerequis:{fr:"Scolarité obligatoire",de:"Obligatorische Schulzeit"},passerelle:{fr:"CFC correspondant",de:"Entsprechende EFZ"},acces:'direct',langue:null},
+      {niveau:'CFC',titre:{fr:"Assistant/e socio-éducatif/ve",de:"Fachfrau/-mann Betreuung EFZ"},duree:{fr:"3 ans",de:"3 Jahre"},dureeAns:3,region:'suisse',prerequis:{fr:"Contrat d'apprentissage",de:"Lehrvertrag"},passerelle:{fr:"ES éducation sociale",de:"HF Soziale Arbeit"},acces:'direct',langue:null,select:'accessible'},
+      {niveau:'ES',titre:{fr:"Éducateur/trice ES",de:"Sozialpädagoge/-pädagogin HF"},duree:{fr:"3 ans",de:"3 Jahre"},dureeAns:3,region:'suisse',prerequis:{fr:"CFC + expérience + stages",de:"EFZ + Erfahrung + Praktika"},passerelle:{fr:"HES travail social ou HEP",de:"FH Soziale Arbeit oder PH"},acces:'transition',langue:null},
+      {niveau:'HES',titre:{fr:"Bachelor en travail social ou enseignement primaire (HEP)",de:"Bachelor Soziale Arbeit oder Primarlehrer/in (PH)"},duree:{fr:"3 ans",de:"3 Jahre"},dureeAns:3,region:'suisse',prerequis:{fr:"CFC + MP, maturité ou passerelle",de:"EFZ + BM, Matura oder Passerelle"},passerelle:{fr:"Master",de:"Master"},acces:'transition',langue:'fr'},
+      {niveau:'UNI',titre:{fr:"Psychologie, Sciences sociales, Sciences de l'éducation",de:"Psychologie, Sozialwissenschaften, Erziehungswissenschaften"},duree:{fr:"3+2 ans",de:"3+2 Jahre"},dureeAns:5,region:'suisse',prerequis:{fr:"Maturité ou Passerelle",de:"Matura oder Passerelle"},passerelle:{fr:"Accès direct",de:"Direkt"},acces:'academic',langue:'fr'}
+    ]},
+  {id:'numerique',nom:{fr:"Numérique & Systèmes",de:"Digitales & Systeme"},color:"#00897b",letter:"D",
+    interets:{numerique:3,analyse_quantitative:2,organisation:1},
+    croisements:['technique','commerce','creation'],exclusions:['numerique'],
+    voies:[
+      {niveau:'CFC',titre:{fr:"Informaticien/ne",de:"Informatiker/in EFZ"},duree:{fr:"4 ans",de:"4 Jahre"},dureeAns:4,region:'suisse',prerequis:{fr:"Contrat d'apprentissage",de:"Lehrvertrag"},passerelle:{fr:"ES ou HES",de:"HF oder FH"},acces:'direct',langue:null,select:'selectif'},
+      {niveau:'ES',titre:{fr:"Technicien/ne ES en informatique",de:"Informatiker/in HF"},duree:{fr:"2–3 ans",de:"2–3 Jahre"},dureeAns:3,region:'suisse',prerequis:{fr:"CFC + expérience",de:"EFZ + Erfahrung"},passerelle:{fr:"HES informatique",de:"FH Informatik"},acces:'transition',langue:null},
+      {niveau:'HES',titre:{fr:"Bachelor en informatique ou cybersécurité",de:"Bachelor Informatik oder Cybersicherheit"},duree:{fr:"3 ans",de:"3 Jahre"},dureeAns:3,region:'suisse',prerequis:{fr:"CFC + MP, maturité ou passerelle",de:"EFZ + BM, Matura oder Passerelle"},passerelle:{fr:"Master",de:"Master"},acces:'transition',langue:'fr'},
+      {niveau:'EPF',titre:{fr:"Informatique, Mathématiques, Ingénierie (EPFL/ETHZ)",de:"Informatik, Mathematik, Ingenieurwesen (EPFL/ETHZ)"},duree:{fr:"3+2 ans",de:"3+2 Jahre"},dureeAns:5,region:'suisse',prerequis:{fr:"Maturité ou Passerelle",de:"Matura oder Passerelle"},passerelle:{fr:"EPFL : CMS pour MP",de:"EPFL: CMS für BM"},acces:'academic',langue:'mixed'}
+    ]},
+  {id:'artisanat',nom:{fr:"Artisanat & Métiers manuels",de:"Handwerk & Manufaktur"},color:"#6d4c41",letter:"A",
+    interets:{artisanat:3,mecanique:1,construction:1},
+    croisements:['technique','nature'],exclusions:['artisanat'],
+    voies:[
+      {niveau:'AFP',titre:{fr:"Aide en menuiserie, horlogerie ou bijouterie",de:"Assistent/in Holz, Uhren oder Schmuck EBA"},duree:{fr:"2 ans",de:"2 Jahre"},dureeAns:2,region:'suisse',prerequis:{fr:"Scolarité obligatoire",de:"Obligatorische Schulzeit"},passerelle:{fr:"CFC correspondant",de:"Entsprechende EFZ"},acces:'direct',langue:null},
+      {niveau:'CFC',titre:{fr:"Menuisier/ère, Horloger/ère, Bijoutier/ère, Ébéniste",de:"Schreiner/in, Uhrmacher/in, Goldschmied/in, Schreiner/in EFZ"},duree:{fr:"3–4 ans",de:"3–4 Jahre"},dureeAns:4,region:'suisse',prerequis:{fr:"Contrat + habileté",de:"Lehrvertrag + Geschick"},passerelle:{fr:"Brevet ou ES",de:"Fachausweis oder HF"},acces:'direct',langue:null,select:'modere'},
+      {niveau:'ES',titre:{fr:"Restaurateur/trice de meubles ES",de:"Möbelrestaurator/in HF"},duree:{fr:"2–3 ans",de:"2–3 Jahre"},dureeAns:3,region:'lemanique',prerequis:{fr:"CFC + expérience",de:"EFZ + Erfahrung"},passerelle:{fr:"HES design ou conservation",de:"FH Design oder Konservierung"},acces:'transition',langue:null},
+      {niveau:'Brevet',titre:{fr:"Maître artisan",de:"Handwerksmeister/in"},duree:{fr:"2 ans en cours d'emploi",de:"2 Jahre berufsbegleitend"},dureeAns:2,region:'lemanique',prerequis:{fr:"CFC + expérience confirmée",de:"EFZ + bestätigte Erfahrung"},passerelle:{fr:"Direction d'atelier",de:"Werkstattleitung"},acces:'transition',langue:null},
+      {niveau:'UNI',titre:{fr:"Conservation-restauration (HEB, UNI)",de:"Konservierung-Restaurierung (HEB, UNI)"},duree:{fr:"3+2 ans",de:"3+2 Jahre"},dureeAns:5,region:'lemanique',prerequis:{fr:"Maturité ou Passerelle + dossier",de:"Matura oder Passerelle + Portfolio"},passerelle:{fr:"Voie académique spécialisée",de:"Spezialisierter Weg"},acces:'academic',langue:'fr'}
+    ]}
+];
+
+const CROSS_SUGGESTIONS = {
+  'technique+numerique':{fr:"Automatisation, robotique, mécatronique, systèmes embarqués, cybersécurité industrielle.",de:"Automatisierung, Robotik, Mechatronik, eingebettete Systeme.",minLevel:'cfc'},
+  'numerique+creation':{fr:"UX/UI design, développement front-end, interactive media, game design, visualisation de données.",de:"UX/UI-Design, Frontend-Entwicklung, Game Design, Datenvisualisierung.",minLevel:'cfc'},
+  'social+creation':{fr:"Art-thérapie, médiation culturelle, animation socioculturelle, design inclusif.",de:"Kunsttherapie, Kulturvermittlung, soziokulturelle Animation.",minLevel:'cfc'},
+  'sante+social':{fr:"Soins palliatifs, accompagnement en fin de vie, santé communautaire.",de:"Palliativpflege, Sterbebegleitung.",minLevel:'cfc'},
+  'commerce+numerique':{fr:"E-commerce, marketing digital, business intelligence.",de:"E-Commerce, digitales Marketing, Business Intelligence.",minLevel:'cfc'},
+  'technique+artisanat':{fr:"Design industriel, prototypage, fabrication numérique, micromécanique.",de:"Industriedesign, Prototyping, digitale Fertigung.",minLevel:'cfc'},
+  'nature+technique':{fr:"Génie environnemental, énergies renouvelables, gestion des ressources.",de:"Umwelttechnik, erneuerbare Energien.",minLevel:'cfc'},
+  'creation+commerce':{fr:"Direction artistique, branding, marketing culturel, événementiel.",de:"Art Direction, Branding, Kulturmarketing.",minLevel:'cfc'}
+};
+
+const LEVEL_RANK = {scolarite:1,afp:2,cfc:3,mp:4,mg:4,hes_uni:5,autre:2};
+
+const AGES = {
+  '15-24':{fr:"Moins de 25 ans",de:"Unter 25 Jahren"},
+  '25-39':{fr:"25 à 40 ans",de:"25 bis 40 Jahre"},
+  '40-49':{fr:"40 à 50 ans",de:"40 bis 50 Jahre"},
+  '50-59':{fr:"50 à 60 ans",de:"50 bis 60 Jahre"},
+  '60+':{fr:"Plus de 60 ans",de:"Über 60 Jahre"}
+};
+
+const STRONG_LANGUAGES = {fr:{fr:"Français",de:"Französisch"},de:{fr:"Allemand",de:"Deutsch"},it:{fr:"Italien",de:"Italienisch"},en:{fr:"Anglais",de:"Englisch"}};
+
+const SKILLS = {
+  admin:{fr:"Gestion administrative",de:"Verwaltung"},redaction:{fr:"Rédaction",de:"Redaktion"},
+  usagers:{fr:"Relation aux usagers",de:"Kundenkontakt"},budget:{fr:"Gestion de budget",de:"Budgetverwaltung"},
+  encadrement:{fr:"Encadrement d'équipe",de:"Teamführung"},technique:{fr:"Technique / manuel",de:"Technik / Handwerk"},
+  creatif:{fr:"Créatif / rédactionnel",de:"Kreativ"},analyse:{fr:"Analyse / données",de:"Analyse / Daten"},
+  formation:{fr:"Enseignement / formation",de:"Lehre / Ausbildung"},soin:{fr:"Soin aux personnes",de:"Personenpflege"},
+  vente:{fr:"Vente / relation client",de:"Verkauf"}
+};
+
+const ADULT_PATHS = [
+  {id:'brevet_admin',titre:{fr:"Brevet fédéral en administration publique",de:"Eidg. Fachausweis Verwaltung"},duree:{fr:"2 ans en cours d'emploi",de:"2 Jahre berufsbegleitend"},dureeAns:2,remunere:true,prerequis:{fr:"CFC + expérience administrative",de:"EFZ + Verwaltungserfahrung"},secteurs:{fr:"Administration fédérale, cantonale, communale",de:"Öffentliche Verwaltung"},skills:['admin','redaction','usagers']},
+  {id:'brevet_gestion',titre:{fr:"Brevet fédéral en gestion d'entreprise",de:"Eidg. Fachausweis Betriebswirtschaft"},duree:{fr:"2 ans en cours d'emploi",de:"2 Jahre berufsbegleitend"},dureeAns:2,remunere:true,prerequis:{fr:"CFC + expérience",de:"EFZ + Erfahrung"},secteurs:{fr:"PME, associations, fondations",de:"KMU, Verbände, Stiftungen"},skills:['budget','encadrement','admin']},
+  {id:'brevet_formateur',titre:{fr:"Brevet fédéral de formateur/trice d'adultes",de:"Eidg. Fachausweis Ausbilder/in"},duree:{fr:"1 an en cours d'emploi",de:"1 Jahr berufsbegleitend"},dureeAns:1,remunere:true,prerequis:{fr:"CFC + expérience",de:"EFZ + Erfahrung"},secteurs:{fr:"Formation continue, entreprises, écoles",de:"Weiterbildung, Unternehmen, Schulen"},skills:['formation','redaction','encadrement']},
+  {id:'vae_es',titre:{fr:"VAE — accès à une ES par validation d'expérience",de:"VAE — Zugang zu HF durch Erfahrungsvalidierung"},duree:{fr:"6 à 12 mois",de:"6 bis 12 Monate"},dureeAns:1,remunere:true,prerequis:{fr:"CFC + 5 ans d'expérience dans le domaine",de:"EFZ + 5 Jahre Erfahrung"},secteurs:{fr:"Tous secteurs selon expérience",de:"Alle Sektoren"},skills:['admin','redaction','usagers','encadrement','technique','soin']},
+  {id:'formation_continue',titre:{fr:"Formation continue ciblée (6-12 mois)",de:"Gezielte Weiterbildung (6-12 Monate)"},duree:{fr:"6 à 12 mois",de:"6 bis 12 Monate"},dureeAns:1,remunere:true,prerequis:{fr:"Expérience professionnelle",de:"Berufserfahrung"},secteurs:{fr:"Selon domaine",de:"Je nach Bereich"},skills:['admin','redaction','usagers','budget','analyse','formation']},
+  {id:'bilan_orp',titre:{fr:"Bilan de compétences ORP",de:"Kompetenzbilanz RAV"},duree:{fr:"2 à 4 demi-journées",de:"2 bis 4 Halbtage"},dureeAns:1,remunere:true,prerequis:{fr:"Inscription ORP",de:"RAV-Anmeldung"},secteurs:{fr:"Orientation générale",de:"Allgemeine Orientierung"},skills:[]}
+];
+
+/* ========== TRADUCTIONS ========== */
+const T = {
+  fr:{
+    welcome_title:"Boussole — Explorer les chemins de la formation en Suisse",
+    welcome_lead:"Un outil qui tient compte de votre situation réelle : âge, niveau, région, durée, mobilité, finances, langues, permis, compétences.",
+    welcome_body:"Boussole vous aide à situer vos intérêts et à découvrir les chemins de formation qui y mènent en Suisse. L'outil adapte ses résultats à vos contraintes réelles et détecte les profils en transition.",
+    welcome_features:["Contexte initial de 5 minutes (incluant votre région de résidence)","8 questions sur vos axes universels","48 questions sur vos intérêts fins","Résultats hiérarchisés + mode transition si besoin","Voies de reconversion adulte (Brevet, VAE, ORP)","100% local — aucune donnée transmise"],
+    lpd_title:"Protection des données",lpd_text:"Vos réponses restent dans votre navigateur. Aucune information n'est transmise.",
+    btn_start:"Commencer",
+    context_title:"Votre contexte",context_lead:"Ces informations nous permettent d'adapter les résultats à votre situation réelle.",
+    context_niveau:"Quel est votre niveau de formation actuel ?",context_niveau_hint:"Cela distingue les voies directement accessibles des voies à transition.",
+    context_age:"Quel est votre âge ?",context_age_hint:"Les voies d'apprentissage initial sont généralement fermées aux plus de 25 ans.",
+    context_region:"Où habitez-vous ?",context_region_hint:"Cette information permet de filtrer les voies réellement accessibles depuis chez vous.",
+    context_duree:"Combien de temps pouvez-vous consacrer à votre formation ?",context_duree_hint:"Contrainte décisive pour un adulte en reconversion.",
+    context_mobilite:"Jusqu'où pouvez-vous vous déplacer pour votre formation ?",context_mobilite_hint:"La Suisse a une géographie formative inégale.",
+    context_experience:"Depuis combien d'années travaillez-vous ?",context_experience_hint:"L'expérience peut être valorisée (VAE, ES, Brevet).",
+    context_finances:"Avez-vous besoin d'être rémunéré pendant votre formation ?",context_finances_hint:"Un CFC est rémunéré. Une ES, HES ou UNI ne l'est pas.",
+    context_permis:"Avez-vous le permis de conduire ?",context_permis_hint:"Certaines voies exigent le permis B.",
+    context_langue_faible:"Dans quelle langue êtes-vous le moins à l'aise ?",context_langue_faible_hint:"Nous signalerons les filières qui exigent un bon niveau dans cette langue.",
+    context_langues_fortes:"Dans quelles langues êtes-vous à l'aise ?",context_langues_fortes_hint:"Le bilinguisme est un atout majeur en Suisse.",
+    context_exclusions:"Y a-t-il des domaines ou conditions que vous voulez explicitement écarter ?",context_exclusions_hint:"Plus de 5 exclusions basculent l'outil en mode transition.",
+    context_skills:"Quelles compétences professionnelles avez-vous acquises ?",context_skills_hint:"Ces compétences seront valorisées dans les voies de reconversion adulte.",
+    niveaux:{scolarite:"Scolarité obligatoire",afp:"AFP",cfc:"CFC",mp:"Maturité professionnelle",mg:"Maturité gymnasiale",hes_uni:"Diplôme HES ou UNI",autre:"Autre"},
+    durees:{court:"Moins d'un an",moyen:"1 à 2 ans",standard:"2 à 3 ans",long:"3 à 5 ans",tres_long:"5 ans et plus"},
+    mobilites:{ville:"Ma ville uniquement",region:"Ma région",suisse:"Toute la Suisse",etranger:"Toute la Suisse et l'étranger"},
+    experiences:{aucune:"Aucune expérience",court:"1 à 3 ans",moyen:"3 à 10 ans",long:"Plus de 10 ans"},
+    finances:{oui_absolu:"Oui, indispensable",prefere:"Préférable",non:"Non, pas nécessaire"},
+    permis_options:{oui:"Oui",en_cours:"En cours / bientôt",non_pas_possible:"Non, et ce n'est pas possible"},
+    langues:{fr:"Français",de:"Allemand",it:"Italien",en:"Anglais"},
+    exclusions:{soin:"Soin aux personnes",social:"Social / éducation",enseignement:"Enseignement",commerce:"Commerce / vente",artisanat:"Travail manuel / artisanat",nature:"Nature / plein air",technique:"Technique / industriel",numerique:"Numérique / informatique",creation:"Création / communication",sante:"Santé / médecine",contact_difficulte:"Contact avec personnes en difficulté",animation:"Animation de groupe",solitaire:"Travail solitaire",open_space:"Travail en open space",management:"Management d'équipe"},
+    matieres:{maths:"Mathématiques",physique:"Physique",bio:"Biologie",chimie:"Chimie",francais:"Français",philo:"Philosophie",histoire:"Histoire",eco:"Économie",arts:"Arts",info:"Informatique"},
+    btn_validate_context:"Valider et continuer →",
+    context_summary:"Votre contexte",
+    context_summary_niveau:"Niveau",context_summary_age:"Âge",context_summary_region:"Région",context_summary_duree:"Durée max.",context_summary_mobilite:"Mobilité",context_summary_experience:"Expérience",context_summary_finances:"Besoins financiers",context_summary_permis:"Permis",context_summary_langue_faible:"Langue faible",context_summary_langues_fortes:"Langues fortes",context_summary_exclusions:"Domaines écartés",context_summary_skills:"Compétences",
+    axes_title:"Étape 1 — Vos axes universels",axes_body:"Ces 8 questions situent vos préférences sur deux axes.",axes_question:"Dans quelle mesure cette affirmation vous correspond-elle ?",axes_intro_title:"Avant de commencer",axes_intro_body:"Répondez spontanément.",
+    int_title:"Étape 2 — Vos intérêts fins",int_body:"Ces 48 questions explorent 16 domaines d'intérêt.",int_question:"Dans quelle mesure aimez-vous ou vous voyez-vous faire cela ?",
+    scale_labels:["Pas du tout","Un peu","Moyennement","Beaucoup","Énormément"],
+    btn_back:"← Précédent",btn_continue:"Continuer →",question_n:"Question {n} sur {total}",
+    results_title:"Votre boussole",
+    axis_pt_title:"Axe Personnes ↔ Choses",axis_pt_left:"Choses",axis_pt_right:"Personnes",
+    axis_di_title:"Axe Données ↔ Idées",axis_di_left:"Idées",axis_di_right:"Données",
+    axis_balanced:"Équilibré",
+    polarization_note:"Votre profil est équilibré : vous êtes ouverts à de nombreux domaines.",
+    polarization_strong:"Votre profil est très différencié.",
+    top_interests_title:"Vos intérêts dominants",
+    top_territories_title:"Territoires professionnels correspondants",
+    top_territories_lead:"Voies hiérarchisées selon votre niveau, âge, région, durée, finances, mobilité.",
+    why_attracted:"Ce qui vous attire :",
+    path_direct:"Directement accessibles",path_transition:"Nécessitent une transition",path_academic:"Voie académique (UNI/EPF)",path_not_relevant:"Non pertinents (niveau dépassé)",path_duration_blocked:"Exclues par votre durée maximale",path_finance_blocked:"Exclues par vos besoins financiers",path_region_blocked:"Hors de votre région de résidence",
+    level_afp:"AFP",level_cfc:"CFC",level_es:"ES",level_hes:"HES",level_uni:"UNI",level_epf:"EPF",level_brevet:"Brevet fédéral",
+    duree:"Durée",prerequis:"Prérequis",passerelle:"Passerelle / Accès",
+    badge_paid:"💶 Rémunéré",badge_salary:"💼 Salaire maintenu",badge_unpaid:"⚠️ Non rémunéré",badge_accessible:"🟢 Accessible",badge_modere:"🟡 Modéré",badge_selectif:"🔴 Sélectif",badge_permis:"🚗 Permis requis",badge_bilingue:"🇨🇭 Bilingue (atout)",
+    mp_note:"💡 Option : avec maturité professionnelle intégrée → 4 ans, accès HES",
+    excluded_title:"Territoires écartés",excluded_note:"Vous avez indiqué vouloir écarter ces domaines.",
+    cross_title:"Correspondances croisées",cross_lead:"Combinaisons entre deux territoires proches en score.",
+    cross_empty_title:"Correspondances croisées",cross_empty_text:"Ces combinaisons s'ouvriront quand vous aurez atteint un CFC ou plus.",
+    expand_all:"Voir les 8 territoires",collapse_all:"Réduire",
+    matching_strong:"Correspondance forte",matching_medium:"Correspondance moyenne",matching_weak:"Correspondance modérée",
+    lang_warning:"Cette filière exige un bon niveau dans votre langue faible.",lang_warning_ethz:"L'ETHZ est en allemand. Privilégiez l'EPFL.",
+    mob_warning:"Cette filière se trouve hors de votre périmètre de mobilité.",
+    dur_warning:"Cette filière dépasse votre durée maximale.",
+    fin_warning:"Cette filière n'est pas rémunérée et vous avez besoin d'un revenu.",
+    region_warning:"Cette filière se trouve hors de votre région de résidence.",
+    permis_warning:"Cette filière exige souvent le permis de conduire.",
+    select_warning:"Cette filière est sélective — concurrence forte.",
+    vae_title:"Valorisez votre expérience",vae_intro:"Avec votre expérience, plusieurs voies s'ouvrent.",
+    vae_1:"Accéder à une ES par VAE.",vae_2:"Reprendre ou créer une entreprise artisanale.",vae_3:"Gestion d'atelier ou direction de structure.",vae_4:"Brevet fédéral en gestion (2 ans en cours d'emploi).",vae_footer:"Renseignez-vous auprès de votre canton.",
+    adult_title:"Voies de reconversion adulte",adult_lead:"Voies spécifiques pour les adultes en reconversion.",
+    adult_duree:"Durée",adult_prerequis:"Prérequis",adult_secteurs:"Secteurs",adult_remunere:"Rémunéré",
+    transition_title:"Votre profil est en transition",
+    transition_intro:"Votre profil ne présente pas d'intérêt dominant. <strong>Ce n'est pas un échec — c'est une donnée.</strong> Cela peut signifier plusieurs choses :",
+    transition_reasons:"<li>Vous êtes dans une phase de rejet.</li><li>Vous valorisez des dimensions que cet outil ne mesure pas : sécurité, dignité, utilité sociale, autonomie.</li><li>Vous avez accumulé des compétences qui ne se traduisent pas en intérêts.</li>",
+    transition_reco_title:"Ce que nous vous recommandons",
+    transition_reco_1_title:"Faire un bilan de compétences",transition_reco_1_desc:"Avec un·e conseiller·ère ORP — gratuit, 2 à 4 demi-journées.",
+    transition_reco_2_title:"Explorer les Brevets fédéraux",transition_reco_2_desc:"La voie la plus rapide (2 ans en cours d'emploi, salaire maintenu).",
+    transition_reco_3_title:"Envisager la VAE",transition_reco_3_desc:"Validation des acquis pour obtenir une certification sans repasser par un diplôme initial.",
+    transition_adult_title:"Voies de reconversion adaptées à votre profil",
+    orp_title:"Contact utile",
+    orp_body:"<strong>ORP</strong> — Office régional de placement<br><strong>Bilan de compétences</strong> — gratuit, sur orientation.ch<br><strong>CSFO</strong> — Centre suisse de services Formation professionnelle",
+    dont_title:"Ce que nous ne vous proposons pas",
+    dont_body:"Les voies AFP et CFC (fermées aux plus de 25 ans), les ES/HES/UNI (durée trop longue), et les voies numériques ou commerciales (écartées par votre préférence) ne sont pas recommandées pour votre profil.",
+    academic_note:"Les voies UNI/EPF requièrent une maturité gymnasiale. Les titulaires d'une MP doivent passer la Passerelle (Dubs). L'EPFL propose un CMS pour les MP.",
+    disclaimer_title:"À propos de Boussole",disclaimer_text:"Boussole est un outil d'exploration, pas un test de diagnostic. Il ne prédit ni la réussite ni la satisfaction. Vérifiez toujours sur orientation.ch et auprès d'un·e conseiller·ère.",
+    footer:"Boussole v7.1 · Exploration vocationnelle · Référentiel suisse complet · 100% local",
+    btn_restart:"Recommencer",btn_print:"Imprimer / PDF"
+  },
+  de:{
+    welcome_title:"Boussole — Wege der Bildung in der Schweiz erkunden",
+    welcome_lead:"Ein Instrument, das Ihre reale Situation berücksichtigt: Alter, Niveau, Region, Dauer, Mobilität, Finanzen, Sprachen, Führerschein, Kompetenzen.",
+    welcome_body:"Boussole hilft Ihnen, Ihre Interessen zu verorten und die Bildungswege in der Schweiz zu entdecken.",
+    welcome_features:["Anfangskontext von 5 Minuten (inkl. Wohnregion)","8 Fragen zu universellen Achsen","48 Fragen zu feinen Interessen","Ergebnisse hierarchisiert + Übergangsmodus","Wege der Erwachsenenumstellung (Fachausweis, VAE, RAV)","100% lokal — keine Datenübertragung"],
+    lpd_title:"Datenschutz",lpd_text:"Ihre Antworten bleiben in Ihrem Browser.",
+    btn_start:"Starten",
+    context_title:"Ihr Kontext",context_lead:"Diese Informationen passen die Ergebnisse an Ihre reale Situation an.",
+    context_niveau:"Was ist Ihr aktuelles Bildungsniveau?",context_niveau_hint:"Dies unterscheidet direkt zugängliche von Übergangswegen.",
+    context_age:"Wie alt sind Sie?",context_age_hint:"Erstausbildungswege sind in der Regel für über 25-Jährige geschlossen.",
+    context_region:"Wo wohnen Sie?",context_region_hint:"Damit können wir die tatsächlich erreichbaren Wege filtern.",
+    context_duree:"Wie viel Zeit können Sie aufwenden?",context_duree_hint:"Entscheidende Einschränkung.",
+    context_mobilite:"Wie weit können Sie sich bewegen?",context_mobilite_hint:"Die Schweiz hat eine ungleiche Bildungsgeographie.",
+    context_experience:"Seit wie vielen Jahren arbeiten Sie?",context_experience_hint:"Erfahrung kann aufgewertet werden.",
+    context_finances:"Brauchen Sie ein Einkommen während der Ausbildung?",context_finances_hint:"EFZ ist bezahlt, HF/FH/UNI nicht.",
+    context_permis:"Haben Sie einen Führerschein?",context_permis_hint:"Einige Wege erfordern den Führerschein B.",
+    context_langue_faible:"In welcher Sprache sind Sie am wenigsten sicher?",context_langue_faible_hint:"Wir markieren entsprechende Studiengänge.",
+    context_langues_fortes:"In welchen Sprachen sind Sie sicher?",context_langues_fortes_hint:"Zweisprachigkeit ist ein Vorteil in der Schweiz.",
+    context_exclusions:"Gibt es Bereiche, die Sie ausschließen möchten?",context_exclusions_hint:"Mehr als 5 Ausschlüsse aktivieren den Übergangsmodus.",
+    context_skills:"Welche beruflichen Kompetenzen haben Sie erworben?",context_skills_hint:"Diese werden in Erwachsenenwegen aufgewertet.",
+    niveaux:{scolarite:"Obligatorische Schulzeit",afp:"EBA",cfc:"EFZ",mp:"Berufsmaturität",mg:"Gymnasiale Matura",hes_uni:"HF- oder UNI-Diplom",autre:"Andere"},
+    durees:{court:"Weniger als ein Jahr",moyen:"1 bis 2 Jahre",standard:"2 bis 3 Jahre",long:"3 bis 5 Jahre",tres_long:"5 Jahre und mehr"},
+    mobilites:{ville:"Nur meine Stadt",region:"Meine Region",suisse:"Ganze Schweiz",etranger:"Schweiz und Ausland"},
+    experiences:{aucune:"Keine Erfahrung",court:"1 bis 3 Jahre",moyen:"3 bis 10 Jahre",long:"Mehr als 10 Jahre"},
+    finances:{oui_absolu:"Ja, unbedingt",prefere:"Vorzugswürdig",non:"Nicht nötig"},
+    permis_options:{oui:"Ja",en_cours:"In Arbeit",non_pas_possible:"Nein, nicht möglich"},
+    langues:{fr:"Französisch",de:"Deutsch",it:"Italienisch",en:"Englisch"},
+    exclusions:{soin:"Personenpflege",social:"Soziales / Bildung",enseignement:"Lehre",commerce:"Handel / Verkauf",artisanat:"Handwerk",nature:"Natur",technique:"Technik",numerique:"Digitales",creation:"Gestaltung",sante:"Gesundheit",contact_difficulte:"Kontakt mit Menschen in Schwierigkeiten",animation:"Gruppenanimation",solitaire:"Einsame Arbeit",open_space:"Open-Space-Arbeit",management:"Teamführung"},
+    matieres:{maths:"Mathematik",physique:"Physik",bio:"Biologie",chimie:"Chemie",francais:"Französisch",philo:"Philosophie",histoire:"Geschichte",eco:"Wirtschaft",arts:"Kunst",info:"Informatik"},
+    btn_validate_context:"Bestätigen und fortfahren →",
+    context_summary:"Ihr Kontext",
+    context_summary_niveau:"Niveau",context_summary_age:"Alter",context_summary_region:"Region",context_summary_duree:"Max. Dauer",context_summary_mobilite:"Mobilität",context_summary_experience:"Erfahrung",context_summary_finances:"Finanzbedarf",context_summary_permis:"Führerschein",context_summary_langue_faible:"Schwache Sprache",context_summary_langues_fortes:"Starke Sprachen",context_summary_exclusions:"Ausgeschlossen",context_summary_skills:"Kompetenzen",
+    axes_title:"Schritt 1 — Ihre Achsen",axes_body:"8 Fragen zu Ihren Präferenzen.",axes_question:"Wie sehr trifft dies zu?",axes_intro_title:"Vor dem Start",axes_intro_body:"Antworten Sie spontan.",
+    int_title:"Schritt 2 — Ihre feinen Interessen",int_body:"48 Fragen zu 16 Interessensbereichen.",int_question:"Wie sehr mögen Sie es?",
+    scale_labels:["Überhaupt nicht","Ein wenig","Mäßig","Sehr","Äußerst"],
+    btn_back:"← Zurück",btn_continue:"Weiter →",question_n:"Frage {n} von {total}",
+    results_title:"Ihre Boussole",
+    axis_pt_title:"Achse Menschen ↔ Dinge",axis_pt_left:"Dinge",axis_pt_right:"Menschen",
+    axis_di_title:"Achse Daten ↔ Ideen",axis_di_left:"Ideen",axis_di_right:"Daten",
+    axis_balanced:"Ausgeglichen",
+    polarization_note:"Ihr Profil ist ausgeglichen.",
+    polarization_strong:"Ihr Profil ist sehr differenziert.",
+    top_interests_title:"Ihre dominanten Interessen",
+    top_territories_title:"Entsprechende Berufsfelder",
+    top_territories_lead:"Nach Niveau, Alter, Region, Dauer, Finanzen, Mobilität hierarchisiert.",
+    why_attracted:"Was Sie anzieht:",
+    path_direct:"Direkt zugänglich",path_transition:"Übergang erforderlich",path_academic:"Akademischer Weg (UNI/EPF)",path_not_relevant:"Nicht relevant",path_duration_blocked:"Durch Dauer ausgeschlossen",path_finance_blocked:"Durch Finanzbedarf ausgeschlossen",path_region_blocked:"Außerhalb Ihrer Region",
+    level_afp:"EBA",level_cfc:"EFZ",level_es:"HF",level_hes:"FH",level_uni:"UNI",level_epf:"EPF",level_brevet:"Fachausweis",
+    duree:"Dauer",prerequis:"Voraussetzungen",passerelle:"Übergang",
+    badge_paid:"💶 Bezahlt",badge_salary:"💼 Lohn beibehalten",badge_unpaid:"⚠️ Unbezahlt",badge_accessible:"🟢 Zugänglich",badge_modere:"🟡 Mäßig",badge_selectif:"🔴 Selektiv",badge_permis:"🚗 Führerschein",badge_bilingue:"🇨🇭 Zweisprachig",
+    mp_note:"💡 Option: mit Berufsmaturität → 4 Jahre, FH-Zugang",
+    excluded_title:"Ausgeschlossene Bereiche",excluded_note:"Sie haben diese Bereiche ausgeschlossen.",
+    cross_title:"Querverbindungen",cross_lead:"Kombinationen zweier Felder.",
+    cross_empty_title:"Querverbindungen",cross_empty_text:"Diese Kombinationen öffnen sich ab EFZ.",
+    expand_all:"Alle 8 Felder anzeigen",collapse_all:"Reduzieren",
+    matching_strong:"Starke Übereinstimmung",matching_medium:"Mittlere",matching_weak:"Mäßige",
+    lang_warning:"Dieser Weg erfordert Ihre schwache Sprache.",lang_warning_ethz:"Die ETHZ ist auf Deutsch. Bevorzugen Sie die EPFL.",
+    mob_warning:"Außerhalb Ihres Mobilitätsbereichs.",dur_warning:"Überschreitet Ihre maximale Dauer.",
+    fin_warning:"Unbezahlt und Sie brauchen ein Einkommen.",region_warning:"Außerhalb Ihrer Wohnregion.",
+    permis_warning:"Erfordert oft einen Führerschein.",select_warning:"Selektiv — starke Konkurrenz.",
+    vae_title:"Werten Sie Ihre Erfahrung auf",vae_intro:"Mit Ihrer Erfahrung eröffnen sich Wege.",
+    vae_1:"Zugang zu HF durch VAE.",vae_2:"Betriebsübernahme.",vae_3:"Werkstattleitung.",vae_4:"Fachausweis Management (2 Jahre).",vae_footer:"Informieren Sie sich bei Ihrem Kanton.",
+    adult_title:"Wege der Erwachsenenumstellung",adult_lead:"Spezifische Wege für Erwachsene.",
+    adult_duree:"Dauer",adult_prerequis:"Voraussetzungen",adult_secteurs:"Sektoren",adult_remunere:"Bezahlt",
+    transition_title:"Ihr Profil ist im Übergang",
+    transition_intro:"Ihr Profil hat kein dominantes Interesse. <strong>Das ist kein Scheitern — das ist eine Information.</strong> Das kann bedeuten:",
+    transition_reasons:"<li>Sie sind in einer Ablehnungsphase.</li><li>Sie schätzen Dimensionen, die dieses Tool nicht misst.</li><li>Sie haben Kompetenzen, die sich nicht in Interessen übersetzen.</li>",
+    transition_reco_title:"Was wir empfehlen",
+    transition_reco_1_title:"Kompetenzbilanz durchführen",transition_reco_1_desc:"Mit RAV-Berater/in — kostenlos.",
+    transition_reco_2_title:"Eidg. Fachausweise erkunden",transition_reco_2_desc:"Schnellster Weg (2 Jahre berufsbegleitend).",
+    transition_reco_3_title:"VAE erwägen",transition_reco_3_desc:"Zertifizierung ohne Erstausbildung.",
+    transition_adult_title:"Angepasste Wege",
+    orp_title:"Nützlicher Kontakt",
+    orp_body:"<strong>RAV</strong> — Regionales Arbeitsvermittlungszentrum<br><strong>Kompetenzbilanz</strong> — auf berufsberatung.ch<br><strong>SBFI</strong> — Staatssekretariat für Bildung",
+    dont_title:"Was wir nicht empfehlen",
+    dont_body:"EBA/EFZ (für über 25-Jährige geschlossen), HF/FH/UNI (zu lange), digitale oder kaufmännische Wege (ausgeschlossen).",
+    academic_note:"UNI/EPF erfordern gymnasiale Matura. BM-Inhaber: Passerelle (Dubs). EPFL: CMS für BM.",
+    disclaimer_title:"Über Boussole",disclaimer_text:"Boussole ist ein Erkundungsinstrument, kein diagnostischer Test.",
+    footer:"Boussole v7.1 · Berufsfindung · Vollständiges Schweizer System · 100% lokal",
+    btn_restart:"Neu starten",btn_print:"Drucken / PDF"
+  }
+};
+
+/* ========== STATE ========== */
+const state = {
+  lang:'fr',screen:'welcome',
+  context:{niveau:null,age:null,region:null,duree:null,mobilite:null,experience:null,finances:null,permis:null,langueFaible:null,languesFortes:[],exclusions:[],skills:[]},
+  axisOrder:[],axisCursor:0,axisAnswers:{},
+  intOrder:[],intCursor:0,intAnswers:{},
+  axisScores:{PT:0,DI:0},intScores:{},territoryScores:[],showAllTerritories:false
+};
+
+/* ========== UTILS ========== */
+function t(k){const v=T[state.lang][k];return v!==undefined?v:k}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const tmp=b[i];b[i]=b[j];b[j]=tmp}return b}
+function fl(o){return o[state.lang]}
+
+/* ========== SCORING ========== */
+function computeAxes(){
+  let P=0,T_=0,D=0,I=0;
+  for(const idx in state.axisAnswers){
+    const item=AXIS_ITEMS[+idx];if(!item)continue;
+    const v=state.axisAnswers[idx];
+    if(item.axis==='PT'){if(item.pole==='P')P+=v;else T_+=v}
+    else{if(item.pole==='D')D+=v;else I+=v}
+  }
+  state.axisScores.PT=Math.round(((P-T_)/8)*100);
+  state.axisScores.DI=Math.round(((D-I)/8)*100);
+}
+function computeInterests(){
+  const sums={};Object.keys(INTERESTS).forEach(k=>sums[k]=0);
+  for(const idx in state.intAnswers){
+    const item=ITEMS_INT[+idx];if(!item)continue;
+    sums[item[0]]+=state.intAnswers[idx];
+  }
+  const norm={};
+  Object.keys(sums).forEach(k=>{norm[k]=Math.round(((sums[k]-3)/12)*100)});
+  state.intScores=norm;
+}
+function computeTerritoryScores(){
+  const results=TERRITOIRES.map(terr=>{
+    let wSum=0,wTot=0;
+    for(const intId in terr.interets){wSum+=(state.intScores[intId]||0)*terr.interets[intId];wTot+=terr.interets[intId]}
+    const score=wTot>0?Math.round(wSum/wTot):0;
+    const matched=Object.keys(terr.interets).sort((a,b)=>terr.interets[b]-terr.interets[a]);
+    const isExcluded=terr.exclusions.some(ex=>state.context.exclusions.includes(ex));
+    return {territoire:terr,score:score,matchedInts:matched,isExcluded:isExcluded};
+  });
+  results.sort((a,b)=>b.score-a.score);
+  state.territoryScores=results;
+}
+function getTopInterests(n){
+  return Object.entries(state.intScores).sort((a,b)=>b[1]-a[1]).slice(0,n).map(([id,s])=>({id:id,label:INTERESTS[id],score:s}));
+}
+function isTransitionProfile(){
+  const activeTerr=state.territoryScores.filter(r=>!r.isExcluded);
+  const maxTerr=activeTerr.length>0?activeTerr[0].score:0;
+  const maxInt=Math.max(...Object.values(state.intScores));
+  const excl=state.context.exclusions.length;
+  return maxInt<50||maxTerr<40||excl>=5;
+}
+
+/* ========== PATH META ========== */
+function getPathMeta(path){
+  const titleFr=path.titre.fr.toLowerCase();
+  let remun=path.niveau==='Brevet'?'salary_maintained':(path.niveau==='AFP'||path.niveau==='CFC')?'paid':'unpaid';
+  let select=null;
+  if(path.niveau==='CFC'){select=path.select||'modere'}
+  else if(path.niveau==='AFP'){select='accessible'}
+  const permis=path.permis||titleFr.includes('mécanic')||titleFr.includes('électric')||titleFr.includes('agricul')||titleFr.includes('forest');
+  return {remun:remun,select:select,permis:permis,mp:path.niveau==='CFC'};
+}
+
+/* ========== RÉGION ACCESSIBLE ========== */
+function isRegionAccessible(path){
+  const userRegion=state.context.region;
+  const mobilite=state.context.mobilite;
+  if(!userRegion||!mobilite)return true;
+  if(mobilite==='suisse'||mobilite==='etranger')return true;
+  if(path.region==='suisse')return true;
+  // path.region = 'lemanique' : accessible si l'utilisateur est en arc lémanique ou s'il accepte toute la Suisse
+  if(path.region==='lemanique'){
+    if(mobilite==='ville')return userRegion==='lemanique';
+    if(mobilite==='region')return userRegion==='lemanique'||userRegion==='mittelland';
+    return true;
+  }
+  return true;
+}
+
+/* ========== CATEGORIZE ========== */
+function categorizeAccess(path,terrId){
+  const meta=getPathMeta(path);
+  const c=state.context;
+  
+  // Age filter : 40+ → AFP/CFC complètement masqués
+  if(c.age && (c.age==='40-49'||c.age==='50-59'||c.age==='60+') && (path.niveau==='AFP'||path.niveau==='CFC'))return 'age-hidden';
+  if(c.age==='25-39' && path.niveau==='AFP')return 'age-hidden';
+  
+  // Durée
+  const dMax=c.duree==='court'?1:c.duree==='moyen'?2:c.duree==='standard'?3:c.duree==='long'?5:99;
+  if(c.duree && path.dureeAns && path.dureeAns>dMax)return 'duration-blocked';
+  
+  // Région (bloquée si hors mobilité/région)
+  if(!isRegionAccessible(path))return 'region-blocked';
+  
+  // Niveau
+  let cat;
+  if(c.niveau==='mg'){
+    if(path.acces==='academic')cat='direct';
+    else if(path.acces==='transition'&&(path.niveau==='HES'||path.niveau==='UNI'||path.niveau==='EPF'))cat='transition';
+    else if(path.niveau==='AFP'||path.niveau==='CFC')cat='not-relevant';
+    else cat='transition';
+  } else if(c.niveau==='hes_uni'){
+    if(path.acces==='academic'&&(path.niveau==='UNI'||path.niveau==='EPF'||path.niveau==='HES'))cat='direct';
+    else if(path.niveau==='AFP'||path.niveau==='CFC')cat='not-relevant';
+    else cat='transition';
+  } else if(c.niveau==='cfc'||c.niveau==='mp'){
+    if(path.niveau==='AFP')cat='not-relevant';
+    else if(path.acces==='direct')cat='direct';
+    else if(path.niveau==='UNI'||path.niveau==='EPF')cat='academic';
+    else cat='transition';
+  } else if(c.niveau==='afp'){
+    if(path.niveau==='AFP')cat='not-relevant';
+    else cat=path.acces;
+  } else {cat=path.acces}
+  
+  if(c.finances==='oui_absolu'&&meta.remun==='unpaid'&&(cat==='direct'||cat==='transition'||cat==='academic'))return 'finance-blocked';
+  
+  return cat;
+}
+
+/* ========== WARNINGS ========== */
+function getPathWarnings(path,terrId,cat){
+  const meta=getPathMeta(path);
+  const c=state.context;
+  const warnings=[];
+  
+  if(cat==='duration-blocked')warnings.push({type:'danger',text:t('dur_warning')});
+  if(cat==='finance-blocked')warnings.push({type:'danger',text:t('fin_warning')});
+  if(cat==='region-blocked')warnings.push({type:'danger',text:t('region_warning')});
+  if(c.langueFaible==='de' && path.langue==='mixed' && !c.languesFortes.includes('de'))warnings.push({type:'warn',text:t('lang_warning_ethz')});
+  else if(c.langueFaible==='de' && path.langue==='de' && !c.languesFortes.includes('de'))warnings.push({type:'warn',text:t('lang_warning')});
+  if(c.mobilite==='ville' && path.region==='suisse' && c.region && REGIONS[c.region] && !REGIONS[c.region].langues.includes('fr')){
+    // Warning de déplacement uniquement si la voie est hors région linguistique
+    warnings.push({type:'info',text:t('mob_warning')});
+  }
+  if(meta.permis && c.permis!=='oui')warnings.push({type:'warn',text:t('permis_warning')});
+  if(meta.select==='selectif')warnings.push({type:'info',text:t('select_warning')});
+  
+  return warnings;
+}
+
+/* ========== CROSS ========== */
+function getCrossSuggestions(){
+  const userRank=LEVEL_RANK[state.context.niveau]||0;
+  const active=state.territoryScores.filter(r=>!r.isExcluded&&r.score>=40).slice(0,4);
+  const pairs=[];
+  for(let i=0;i<active.length;i++)for(let j=i+1;j<active.length;j++){
+    const a=active[i].territoire.id,b=active[j].territoire.id;
+    const cross=CROSS_SUGGESTIONS[a+'+'+b]||CROSS_SUGGESTIONS[b+'+'+a];
+    if(!cross)continue;
+    if(userRank<LEVEL_RANK[cross.minLevel])continue;
+    pairs.push({label:fl(active[i].territoire.nom)+' × '+fl(active[j].territoire.nom),desc:cross});
+  }
+  return pairs;
+}
+
+/* ========== ADULT PATHS ========== */
+function getRelevantAdultPaths(){
+  const userSkills=state.context.skills||[];
+  return ADULT_PATHS.filter(p=>{
+    if(p.skills.length===0)return true;
+    return p.skills.some(s=>userSkills.includes(s));
+  });
+}
+
+/* ========== RENDER WELCOME ========== */
+function renderWelcome(){
+  const features=t('welcome_features').map(f=>'<li>'+esc(f)+'</li>').join('');
+  return '<div class="card"><h1>'+esc(t('welcome_title'))+'</h1>'+
+    '<p class="lead">'+esc(t('welcome_lead'))+'</p><p>'+esc(t('welcome_body'))+'</p><ul>'+features+'</ul>'+
+    '<div class="info-box"><strong>'+esc(t('lpd_title'))+'</strong><br>'+esc(t('lpd_text'))+'</div>'+
+    '<div class="actions"><button type="button" class="btn btn-primary btn-block" data-action="go-context">'+esc(t('btn_start'))+' →</button></div></div>';
+}
+
+/* ========== RENDER CONTEXT ========== */
+function renderContext(){
+  const niveaux=t('niveaux'),durees=t('durees'),mobilites=t('mobilites'),experiences=t('experiences');
+  const finances=t('finances'),permisO=t('permis_options'),langues=t('langues');
+  const exclusions=t('exclusions');
+  
+  function opts(obj,current,action,multi){
+    return Object.keys(obj).map(k=>{
+      const label=typeof obj[k]==='string'?obj[k]:(obj[k][state.lang]||obj[k].fr);
+      const sel=multi?(current.includes(k)?' selected':''):(current===k?' selected':'');
+      const check=multi?'<span class="form-check"></span>':'';
+      return '<button type="button" class="form-option'+sel+'" data-action="'+action+'" data-value="'+k+'">'+check+'<span>'+esc(label)+'</span></button>';
+    }).join('');
+  }
+  
+  const canContinue=state.context.niveau&&state.context.age&&state.context.region&&state.context.duree&&state.context.mobilite&&state.context.experience&&state.context.finances&&state.context.permis;
+  
+  return '<div class="card"><h1>'+esc(t('context_title'))+'</h1><p class="lead">'+esc(t('context_lead'))+'</p>'+
+    '<div class="form-group"><label class="form-label">'+esc(t('context_niveau'))+'</label><p class="form-hint">'+esc(t('context_niveau_hint'))+'</p><div class="form-options">'+opts(niveaux,state.context.niveau,'set-niveau',false)+'</div></div>'+
+    '<div class="form-group"><label class="form-label">'+esc(t('context_age'))+'</label><p class="form-hint">'+esc(t('context_age_hint'))+'</p><div class="form-options">'+opts(AGES,state.context.age,'set-age',false)+'</div></div>'+
+    '<div class="form-group"><label class="form-label">'+esc(t('context_region'))+'</label><p class="form-hint">'+esc(t('context_region_hint'))+'</p><div class="form-options">'+opts(REGIONS,state.context.region,'set-region',false)+'</div></div>'+
+    '<div class="form-group"><label class="form-label">'+esc(t('context_mobilite'))+'</label><p class="form-hint">'+esc(t('context_mobilite_hint'))+'</p><div class="form-options">'+opts(mobilites,state.context.mobilite,'set-mobilite',false)+'</div></div>'+
+    '<div class="form-group"><label class="form-label">'+esc(t('context_duree'))+'</label><p class="form-hint">'+esc(t('context_duree_hint'))+'</p><div class="form-options">'+opts(durees,state.context.duree,'set-duree',false)+'</div></div>'+
+    '<div class="form-group"><label class="form-label">'+esc(t('context_experience'))+'</label><p class="form-hint">'+esc(t('context_experience_hint'))+'</p><div class="form-options">'+opts(experiences,state.context.experience,'set-experience',false)+'</div></div>'+
+    '<div class="form-group"><label class="form-label">'+esc(t('context_finances'))+'</label><p class="form-hint">'+esc(t('context_finances_hint'))+'</p><div class="form-options">'+opts(finances,state.context.finances,'set-finances',false)+'</div></div>'+
+    '<div class="form-group"><label class="form-label">'+esc(t('context_permis'))+'</label><p class="form-hint">'+esc(t('context_permis_hint'))+'</p><div class="form-options">'+opts(permisO,state.context.permis,'set-permis',false)+'</div></div>'+
+    '<div class="form-group"><label class="form-label">'+esc(t('context_langue_faible'))+'</label><p class="form-hint">'+esc(t('context_langue_faible_hint'))+'</p><div class="form-options">'+opts({fr:langues.fr,de:langues.de,it:langues.it},state.context.langueFaible,'set-langue-faible',false)+'</div></div>'+
+    '<div class="form-group"><label class="form-label">'+esc(t('context_langues_fortes'))+'</label><p class="form-hint">'+esc(t('context_langues_fortes_hint'))+'</p><div class="form-options">'+opts(langues,state.context.languesFortes,'toggle-langue-forte',true)+'</div></div>'+
+    '<div class="form-group"><label class="form-label">'+esc(t('context_skills'))+'</label><p class="form-hint">'+esc(t('context_skills_hint'))+'</p><div class="form-options">'+opts(SKILLS,state.context.skills,'toggle-skill',true)+'</div></div>'+
+    '<div class="form-group"><label class="form-label">'+esc(t('context_exclusions'))+'</label><p class="form-hint">'+esc(t('context_exclusions_hint'))+'</p><div class="form-options">'+opts(exclusions,state.context.exclusions,'toggle-exclusion',true)+'</div></div>'+
+    '<div class="actions"><button type="button" class="btn btn-secondary" data-action="go-back">'+esc(t('btn_back'))+'</button>'+
+    '<button type="button" class="btn btn-primary" style="flex:1" '+(canContinue?'':'disabled ')+'data-action="validate-context">'+esc(t('btn_validate_context'))+'</button></div></div>';
+}
+
+/* ========== AXES + INT ========== */
+function renderAxesIntro(){
+  const scale=t('scale_labels').map((lbl,i)=>'<div class="scale-row"><span class="scale-num">'+(i+1)+'</span><span>'+esc(lbl)+'</span></div>').join('');
+  return '<div class="card"><h1>'+esc(t('axes_title'))+'</h1><p class="lead">'+esc(t('axes_body'))+'</p><div class="info-box">'+esc(t('axes_intro_body'))+'</div>'+
+    '<h3 style="margin-top:20px">Échelle</h3><div class="scale-preview">'+scale+'</div>'+
+    '<div class="actions"><button type="button" class="btn btn-secondary" data-action="go-back">'+esc(t('btn_back'))+'</button>'+
+    '<button type="button" class="btn btn-primary" style="flex:1" data-action="begin-axes">'+esc(t('btn_continue'))+'</button></div></div>';
+}
+function renderAxisQ(){
+  const total=state.axisOrder.length,idx=state.axisCursor,item=AXIS_ITEMS[state.axisOrder[idx]];
+  const progress=Math.round((idx/total)*100),cur=state.axisAnswers[state.axisOrder[idx]];
+  const opts=t('scale_labels').map((lbl,i)=>{const v=i+1,sel=cur===v?' selected':'';return '<button type="button" class="likert-option'+sel+'" data-action="answer-axis" data-value="'+v+'"><span class="dot"></span><span>'+esc(lbl)+'</span></button>'}).join('');
+  return '<div class="card"><div class="progress-wrap"><div class="progress-meta"><span>'+esc(t('question_n').replace('{n}',idx+1).replace('{total}',total))+'</span><span>'+progress+'%</span></div><div class="progress-bar"><div class="progress-fill" style="width:'+progress+'%"></div></div></div>'+
+    '<div class="question-num">'+esc(t('axes_title'))+'</div><div class="question-text">'+esc(fl(item))+'</div><div class="question-hint">'+esc(t('axes_question'))+'</div>'+
+    '<div class="likert">'+opts+'</div><div class="actions"><button type="button" class="btn btn-secondary" data-action="go-back">'+esc(t('btn_back'))+'</button></div></div>';
+}
+function renderIntIntro(){
+  const scale=t('scale_labels').map((lbl,i)=>'<div class="scale-row"><span class="scale-num">'+(i+1)+'</span><span>'+esc(lbl)+'</span></div>').join('');
+  return '<div class="card"><h1>'+esc(t('int_title'))+'</h1><p class="lead">'+esc(t('int_body'))+'</p><h3 style="margin-top:20px">Échelle</h3><div class="scale-preview">'+scale+'</div>'+
+    '<div class="actions"><button type="button" class="btn btn-secondary" data-action="go-back">'+esc(t('btn_back'))+'</button>'+
+    '<button type="button" class="btn btn-primary" style="flex:1" data-action="begin-interests">'+esc(t('btn_continue'))+'</button></div></div>';
+}
+function renderIntQ(){
+  const total=state.intOrder.length,idx=state.intCursor,item=ITEMS_INT[state.intOrder[idx]];
+  const progress=Math.round((idx/total)*100),cur=state.intAnswers[state.intOrder[idx]];
+  const opts=t('scale_labels').map((lbl,i)=>{const v=i+1,sel=cur===v?' selected':'';return '<button type="button" class="likert-option'+sel+'" data-action="answer-int" data-value="'+v+'"><span class="dot"></span><span>'+esc(lbl)+'</span></button>'}).join('');
+  return '<div class="card"><div class="progress-wrap"><div class="progress-meta"><span>'+esc(t('question_n').replace('{n}',idx+1).replace('{total}',total))+'</span><span>'+progress+'%</span></div><div class="progress-bar"><div class="progress-fill int" style="width:'+progress+'%"></div></div></div>'+
+    '<div class="question-num int">'+esc(t('int_title'))+'</div><div class="question-text">'+esc(state.lang==='fr'?item[1]:item[2])+'</div><div class="question-hint">'+esc(t('int_question'))+'</div>'+
+    '<div class="likert">'+opts+'</div><div class="actions"><button type="button" class="btn btn-secondary" data-action="go-back">'+esc(t('btn_back'))+'</button></div></div>';
+}
+
+/* ========== TERRITORY CARD ========== */
+function renderTerritoryCard(result,index){
+  const terr=result.territoire,score=result.score,isExcl=result.isExcluded;
+  const isPrimary=!isExcl&&index<3;
+  const collapsed=(!isPrimary&&!isExcl&&index>=3&&!state.showAllTerritories)?' collapsed':'';
+  const scoreLabel=score>=70?t('matching_strong'):score>=50?t('matching_medium'):t('matching_weak');
+  const why=result.matchedInts.map(intId=>esc(fl(INTERESTS[intId]))).join(', ');
+  
+  const groups={direct:[],transition:[],academic:[],'not-relevant':[],'duration-blocked':[],'finance-blocked':[],'region-blocked':[]};
+  terr.voies.forEach(v=>{
+    const cat=categorizeAccess(v,terr.id);
+    if(cat==='age-hidden')return;
+    groups[cat].push(v);
+  });
+  
+  function renderPath(v,cat){
+    const meta=getPathMeta(v);
+    const levelCls='level-'+v.niveau.toLowerCase().replace('é','e').replace(' ','');
+    const levelKey='level_'+v.niveau.toLowerCase().replace('é','e').replace(' ','');
+    const levelLabel=t(levelKey)||v.niveau;
+    const remunBadge=meta.remun==='paid'?'<span class="path-badge badge-paid">'+esc(t('badge_paid'))+'</span>':meta.remun==='salary_maintained'?'<span class="path-badge badge-salary">'+esc(t('badge_salary'))+'</span>':'<span class="path-badge badge-unpaid">'+esc(t('badge_unpaid'))+'</span>';
+    const selectBadge=meta.select==='accessible'?'<span class="path-badge badge-accessible">'+esc(t('badge_accessible'))+'</span>':meta.select==='modere'?'<span class="path-badge badge-modere">'+esc(t('badge_modere'))+'</span>':meta.select==='selectif'?'<span class="path-badge badge-selectif">'+esc(t('badge_selectif'))+'</span>':'';
+    const permisBadge=meta.permis&&state.context.permis!=='oui'?'<span class="path-badge badge-permis">'+esc(t('badge_permis'))+'</span>':'';
+    const bilingueBadge=(state.context.languesFortes.includes('de')&&(state.context.langueFaible!=='de')&&(v.langue==='mixed'||v.langue==='de'))?'<span class="path-badge badge-bilingue">'+esc(t('badge_bilingue'))+'</span>':'';
+    const mpNote=meta.mp?'<div class="mp-note">'+esc(t('mp_note'))+'</div>':'';
+    const warnings=getPathWarnings(v,terr.id,cat);
+    const warningsHTML=warnings.map(w=>'<div class="path-warning '+w.type+'">⚠️ '+esc(w.text)+'</div>').join('');
+    return '<div class="path-card path-'+cat+'"><div class="path-header"><span class="path-level '+levelCls+'">'+esc(levelLabel)+'</span><span class="path-title">'+esc(fl(v.titre))+'</span></div>'+
+      '<div class="path-meta">'+remunBadge+selectBadge+permisBadge+bilingueBadge+'</div>'+
+      '<div class="path-grid">'+
+        '<div class="path-item"><div class="path-label">'+esc(t('duree'))+'</div><div class="path-value">'+esc(fl(v.duree))+'</div></div>'+
+        '<div class="path-item"><div class="path-label">'+esc(t('prerequis'))+'</div><div class="path-value">'+esc(fl(v.prerequis))+'</div></div>'+
+        '<div class="path-item"><div class="path-label">'+esc(t('passerelle'))+'</div><div class="path-value">'+esc(fl(v.passerelle))+'</div></div>'+
+      '</div>'+mpNote+warningsHTML+'</div>';
+  }
+  
+  let pathsHTML='';
+  const order=['direct','transition','academic','duration-blocked','finance-blocked','region-blocked','not-relevant'];
+  const labels={direct:t('path_direct'),transition:t('path_transition'),academic:t('path_academic'),'duration-blocked':t('path_duration_blocked'),'finance-blocked':t('path_finance_blocked'),'region-blocked':t('path_region_blocked'),'not-relevant':t('path_not_relevant')};
+  order.forEach(cat=>{
+    if(groups[cat].length>0){
+      pathsHTML+='<div class="path-group-header '+cat+'">'+esc(labels[cat])+'</div>';
+      pathsHTML+=groups[cat].map(v=>renderPath(v,cat)).join('');
+    }
+  });
+  
+  const totalPaths=Object.keys(groups).reduce((s,k)=>s+groups[k].length,0);
+  if(totalPaths===0)pathsHTML='<div style="padding:16px 20px;color:var(--muted);font-style:italic">'+esc(t('excluded_note'))+'</div>';
+  
+  return '<div class="territory '+(isPrimary?'primary ':'')+(isExcl?'excluded':'')+'">'+
+    '<div class="territory-header"><div class="territory-badge" style="background:'+terr.color+'">'+esc(terr.letter)+'</div>'+
+      '<div class="territory-info"><div class="territory-name">'+esc(fl(terr.nom))+(isExcl?' <span class="excluded-badge">'+esc(t('excluded_title'))+'</span>':'')+'</div>'+
+      '<div class="territory-score">'+esc(scoreLabel)+' · '+score+'%</div>'+
+      '<div class="territory-why">'+esc(t('why_attracted'))+' '+why+'</div></div></div>'+
+    '<div class="territory-content'+collapsed+'">'+pathsHTML+'</div></div>';
+}
+
+/* ========== ADULT PATHS SECTION ========== */
+function renderAdultPathsSection(){
+  const adultPaths=getRelevantAdultPaths();
+  if(adultPaths.length===0)return '';
+  const cards=adultPaths.map(p=>{
+    const remunBadge=p.remunere?'<span class="path-badge badge-paid">'+esc(t('adult_remunere'))+'</span>':'<span class="path-badge badge-unpaid">⚠️</span>';
+    return '<div class="adult-path"><div class="adult-path-header"><span class="adult-path-title">'+esc(fl(p.titre))+'</span>'+remunBadge+'</div>'+
+      '<div class="adult-path-grid">'+
+        '<div class="adult-path-item"><div class="adult-path-label">'+esc(t('adult_duree'))+'</div><div class="adult-path-value">'+esc(fl(p.duree))+'</div></div>'+
+        '<div class="adult-path-item"><div class="adult-path-label">'+esc(t('adult_prerequis'))+'</div><div class="adult-path-value">'+esc(fl(p.prerequis))+'</div></div>'+
+        '<div class="adult-path-item"><div class="adult-path-label">'+esc(t('adult_secteurs'))+'</div><div class="adult-path-value">'+esc(fl(p.secteurs))+'</div></div>'+
+      '</div></div>';
+  }).join('');
+  return '<h2>'+esc(t('adult_title'))+'</h2><p style="font-size:.88rem;color:var(--muted)">'+esc(t('adult_lead'))+'</p>'+cards;
+}
+
+/* ========== TRANSITION RESULTS ========== */
+function renderTransitionResults(){
+  const adultPaths=getRelevantAdultPaths();
+  const pt=state.axisScores.PT,di=state.axisScores.DI;
+  
+  const ptBar='<div class="axis-row"><div class="axis-title">'+esc(t('axis_pt_title'))+'</div><div class="axis-bar"><div class="axis-dot" style="left:'+((pt+100)/2)+'%"></div></div>'+
+    '<div class="axis-labels"><span>← '+esc(t('axis_pt_left'))+'</span><span>'+esc(t('axis_pt_right'))+' →</span></div>'+
+    '<div class="axis-value">'+(Math.abs(pt)<8?esc(t('axis_balanced')):(pt>0?'+'+pt+' '+t('axis_pt_right'):pt+' '+t('axis_pt_left')))+'</div></div>';
+  const diBar='<div class="axis-row"><div class="axis-title">'+esc(t('axis_di_title'))+'</div><div class="axis-bar"><div class="axis-dot" style="left:'+((di+100)/2)+'%"></div></div>'+
+    '<div class="axis-labels"><span>← '+esc(t('axis_di_left'))+'</span><span>'+esc(t('axis_di_right'))+' →</span></div>'+
+    '<div class="axis-value">'+(Math.abs(di)<8?esc(t('axis_balanced')):(di>0?'+'+di+' '+t('axis_di_right'):di+' '+t('axis_di_left')))+'</div></div>';
+  
+  const niveaux=t('niveaux'),durees=t('durees'),mobilites=t('mobilites'),experiences=t('experiences');
+  const finances=t('finances'),permisO=t('permis_options'),langues=t('langues'),exclusions=t('exclusions');
+  const ctx=[];
+  if(state.context.niveau)ctx.push(t('context_summary_niveau')+': '+esc(niveaux[state.context.niveau]));
+  if(state.context.age)ctx.push(t('context_summary_age')+': '+esc(fl(AGES[state.context.age])));
+  if(state.context.region)ctx.push(t('context_summary_region')+': '+esc(fl(REGIONS[state.context.region])));
+  if(state.context.duree)ctx.push(t('context_summary_duree')+': '+esc(durees[state.context.duree]));
+  if(state.context.mobilite)ctx.push(t('context_summary_mobilite')+': '+esc(mobilites[state.context.mobilite]));
+  if(state.context.experience)ctx.push(t('context_summary_experience')+': '+esc(experiences[state.context.experience]));
+  if(state.context.finances)ctx.push(t('context_summary_finances')+': '+esc(finances[state.context.finances]));
+  if(state.context.permis)ctx.push(t('context_summary_permis')+': '+esc(permisO[state.context.permis]));
+  if(state.context.langueFaible)ctx.push(t('context_summary_langue_faible')+': '+esc(langues[state.context.langueFaible]));
+  if(state.context.languesFortes.length>0)ctx.push(t('context_summary_langues_fortes')+': '+state.context.languesFortes.map(l=>esc(langues[l])).join(', '));
+  if(state.context.exclusions.length>0)ctx.push(t('context_summary_exclusions')+': '+state.context.exclusions.map(e=>esc(exclusions[e])).join(', '));
+  if(state.context.skills.length>0)ctx.push(t('context_summary_skills')+': '+state.context.skills.map(s=>esc(fl(SKILLS[s]))).join(', '));
+  const ctxHTML='<div class="context-box"><strong>'+esc(t('context_summary'))+'</strong><br>'+ctx.join('<br>')+'</div>';
+  
+  const adultCards=adultPaths.map(p=>{
+    return '<div class="adult-path"><div class="adult-path-header"><span class="adult-path-title">'+esc(fl(p.titre))+'</span>'+((p.remunere)?'<span class="path-badge badge-paid">'+esc(t('adult_remunere'))+'</span>':'')+'</div>'+
+      '<div class="adult-path-grid">'+
+        '<div class="adult-path-item"><div class="adult-path-label">'+esc(t('adult_duree'))+'</div><div class="adult-path-value">'+esc(fl(p.duree))+'</div></div>'+
+        '<div class="adult-path-item"><div class="adult-path-label">'+esc(t('adult_prerequis'))+'</div><div class="adult-path-value">'+esc(fl(p.prerequis))+'</div></div>'+
+        '<div class="adult-path-item"><div class="adult-path-label">'+esc(t('adult_secteurs'))+'</div><div class="adult-path-value">'+esc(fl(p.secteurs))+'</div></div>'+
+      '</div></div>';
+  }).join('');
+  
+  return '<div class="card"><h1>'+esc(t('results_title'))+' — '+esc(t('transition_title'))+'</h1>'+
+    ctxHTML+
+    '<h2>'+esc(t('axis_pt_title'))+' / '+esc(t('axis_di_title'))+'</h2>'+ptBar+diBar+
+    '<div class="transition-box"><h3>⚠️ '+esc(t('transition_title'))+'</h3>'+
+      '<p>'+t('transition_intro')+'</p>'+
+      '<ul style="margin-top:10px">'+
+        '<li>'+esc('Vous êtes dans une phase de rejet (vous savez ce que vous ne voulez plus, pas encore ce que vous voulez).')+'</li>'+
+        '<li>'+esc('Vous valorisez des dimensions que cet outil ne mesure pas : sécurité, dignité, utilité sociale, autonomie.')+'</li>'+
+        '<li>'+esc('Vous avez accumulé des compétences (gestion, rédaction, relation aux usagers) qui ne se traduisent pas en intérêts.')+'</li>'+
+      '</ul></div>'+
+    '<h2>'+esc(t('transition_reco_title'))+'</h2>'+
+    '<div class="recommendation"><span class="recommendation-num">1</span><span class="recommendation-title">'+esc(t('transition_reco_1_title'))+'</span><div class="recommendation-desc">'+esc(t('transition_reco_1_desc'))+'</div></div>'+
+    '<div class="recommendation"><span class="recommendation-num">2</span><span class="recommendation-title">'+esc(t('transition_reco_2_title'))+'</span><div class="recommendation-desc">'+esc(t('transition_reco_2_desc'))+'</div></div>'+
+    '<div class="recommendation"><span class="recommendation-num">3</span><span class="recommendation-title">'+esc(t('transition_reco_3_title'))+'</span><div class="recommendation-desc">'+esc(t('transition_reco_3_desc'))+'</div></div>'+
+    '<h2>'+esc(t('transition_adult_title'))+'</h2>'+adultCards+
+    '<div class="orp-box"><strong>'+esc(t('orp_title'))+'</strong><br>'+t('orp_body')+'</div>'+
+    '<div class="dont-box"><strong>'+esc(t('dont_title'))+'</strong><br>'+esc(t('dont_body'))+'</div>'+
+    '<div class="warning-box" style="margin-top:24px"><strong>'+esc(t('disclaimer_title'))+'</strong><br>'+esc(t('disclaimer_text'))+'</div>'+
+    '<div class="actions"><button type="button" class="btn btn-secondary" data-action="print">🖨 '+esc(t('btn_print'))+'</button>'+
+    '<button type="button" class="btn btn-primary" style="flex:1" data-action="restart">'+esc(t('btn_restart'))+' ↻</button></div></div>';
+}
+
+/* ========== NORMAL RESULTS ========== */
+function renderNormalResults(){
+  const topInt=getTopInterests(3);
+  const active=state.territoryScores.filter(r=>!r.isExcluded);
+  const excl=state.territoryScores.filter(r=>r.isExcluded);
+  const topActive=active.slice(0,3);
+  const otherActive=active.slice(3);
+  const crosses=getCrossSuggestions();
+  const userRank=LEVEL_RANK[state.context.niveau]||0;
+  
+  const pt=state.axisScores.PT,di=state.axisScores.DI;
+  const isBal=Math.abs(pt)<30&&Math.abs(di)<30,isStrong=Math.abs(pt)>=60||Math.abs(di)>=60;
+  const polarNote=isStrong?t('polarization_strong'):isBal?t('polarization_note'):null;
+  
+  const ptBar='<div class="axis-row"><div class="axis-title">'+esc(t('axis_pt_title'))+'</div><div class="axis-bar"><div class="axis-dot" style="left:'+((pt+100)/2)+'%"></div></div>'+
+    '<div class="axis-labels"><span>← '+esc(t('axis_pt_left'))+'</span><span>'+esc(t('axis_pt_right'))+' →</span></div>'+
+    '<div class="axis-value">'+(Math.abs(pt)<8?esc(t('axis_balanced')):(pt>0?'+'+pt+' '+t('axis_pt_right'):pt+' '+t('axis_pt_left')))+'</div></div>';
+  const diBar='<div class="axis-row"><div class="axis-title">'+esc(t('axis_di_title'))+'</div><div class="axis-bar"><div class="axis-dot" style="left:'+((di+100)/2)+'%"></div></div>'+
+    '<div class="axis-labels"><span>← '+esc(t('axis_di_left'))+'</span><span>'+esc(t('axis_di_right'))+' →</span></div>'+
+    '<div class="axis-value">'+(Math.abs(di)<8?esc(t('axis_balanced')):(di>0?'+'+di+' '+t('axis_di_right'):di+' '+t('axis_di_left')))+'</div></div>';
+  
+  const intHTML=topInt.map(ti=>'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg);border-radius:8px;margin-bottom:8px"><span style="font-weight:600">'+esc(fl(ti.label))+'</span><span style="font-weight:800;color:var(--teal);font-size:1.1rem">'+ti.score+'</span></div>').join('');
+  
+  const niveaux=t('niveaux'),durees=t('durees'),mobilites=t('mobilites'),experiences=t('experiences'),finances=t('finances'),permisO=t('permis_options'),langues=t('langues'),exclusions=t('exclusions');
+  const ctx=[];
+  if(state.context.niveau)ctx.push(t('context_summary_niveau')+': '+esc(niveaux[state.context.niveau]));
+  if(state.context.age)ctx.push(t('context_summary_age')+': '+esc(fl(AGES[state.context.age])));
+  if(state.context.region)ctx.push(t('context_summary_region')+': '+esc(fl(REGIONS[state.context.region])));
+  if(state.context.duree)ctx.push(t('context_summary_duree')+': '+esc(durees[state.context.duree]));
+  if(state.context.mobilite)ctx.push(t('context_summary_mobilite')+': '+esc(mobilites[state.context.mobilite]));
+  if(state.context.experience)ctx.push(t('context_summary_experience')+': '+esc(experiences[state.context.experience]));
+  if(state.context.finances)ctx.push(t('context_summary_finances')+': '+esc(finances[state.context.finances]));
+  if(state.context.permis)ctx.push(t('context_summary_permis')+': '+esc(permisO[state.context.permis]));
+  if(state.context.langueFaible)ctx.push(t('context_summary_langue_faible')+': '+esc(langues[state.context.langueFaible]));
+  if(state.context.languesFortes.length>0)ctx.push(t('context_summary_langues_fortes')+': '+state.context.languesFortes.map(l=>esc(langues[l])).join(', '));
+  if(state.context.exclusions.length>0)ctx.push(t('context_summary_exclusions')+': '+state.context.exclusions.map(e=>esc(exclusions[e])).join(', '));
+  if(state.context.skills.length>0)ctx.push(t('context_summary_skills')+': '+state.context.skills.map(s=>esc(fl(SKILLS[s]))).join(', '));
+  const ctxHTML='<div class="context-box"><strong>'+esc(t('context_summary'))+'</strong><br>'+ctx.join('<br>')+'</div>';
+  
+  const vaeHTML=(state.context.experience==='moyen'||state.context.experience==='long')?
+    '<div class="vae-box"><strong>'+esc(t('vae_title'))+'</strong><p style="font-size:.85rem;margin:6px 0 10px">'+esc(t('vae_intro'))+'</p><ul style="margin-bottom:10px"><li>'+esc(t('vae_1'))+'</li><li>'+esc(t('vae_2'))+'</li><li>'+esc(t('vae_3'))+'</li><li>'+esc(t('vae_4'))+'</li></ul><p style="font-size:.82rem;color:var(--muted);font-style:italic;margin-bottom:0">'+esc(t('vae_footer'))+'</p></div>':'';
+  
+  const tertHTML=topActive.map((r,i)=>renderTerritoryCard(r,i)).join('');
+  const otherHTML=otherActive.map((r,i)=>renderTerritoryCard(r,i+3)).join('');
+  const exclHTML=excl.map(r=>renderTerritoryCard(r,99)).join('');
+  const expandBtn=otherActive.length>0?'<div class="expand-toggle" data-action="toggle-territories">'+(state.showAllTerritories?('▲ '+esc(t('collapse_all'))):('▼ '+esc(t('expand_all'))+' ('+otherActive.length+')'))+'</div>':'';
+  
+  let crossHTML='';
+  if(userRank>=3 && crosses.length>0){
+    crossHTML='<div class="cross-box"><strong>'+esc(t('cross_title'))+'</strong><p style="font-size:.85rem;margin:6px 0 10px">'+esc(t('cross_lead'))+'</p><div class="cross-grid">'+crosses.map(c=>'<div class="cross-item"><div class="cross-item-title">'+esc(c.label)+'</div><div class="cross-item-desc">'+esc(fl(c.desc))+'</div></div>').join('')+'</div></div>';
+  }
+  
+  const adultHTML=(state.context.age==='40-49'||state.context.age==='50-59'||state.context.age==='60+')?renderAdultPathsSection():'';
+  
+  const exclSection=excl.length>0?'<h2>'+esc(t('excluded_title'))+'</h2><p style="font-size:.85rem;color:var(--muted)">'+esc(t('excluded_note'))+'</p>'+exclHTML:'';
+  const polarHTML=polarNote?'<div class="polarization-box">'+esc(polarNote)+'</div>':'';
+  
+  return '<div class="card"><h1>'+esc(t('results_title'))+'</h1>'+
+    ctxHTML+
+    '<h2>'+esc(t('axis_pt_title'))+' / '+esc(t('axis_di_title'))+'</h2>'+ptBar+diBar+polarHTML+
+    '<h2>'+esc(t('top_interests_title'))+'</h2>'+intHTML+vaeHTML+
+    '<h2>'+esc(t('top_territories_title'))+'</h2><p style="font-size:.9rem;color:var(--muted)">'+esc(t('top_territories_lead'))+'</p>'+
+    tertHTML+otherHTML+expandBtn+crossHTML+adultHTML+exclSection+
+    '<div class="academic-box"><strong>Voies UNI / EPF</strong><br>'+esc(t('academic_note'))+'</div>'+
+    '<div class="warning-box" style="margin-top:24px"><strong>'+esc(t('disclaimer_title'))+'</strong><br>'+esc(t('disclaimer_text'))+'</div>'+
+    '<div class="actions"><button type="button" class="btn btn-secondary" data-action="print">🖨 '+esc(t('btn_print'))+'</button>'+
+    '<button type="button" class="btn btn-primary" style="flex:1" data-action="restart">'+esc(t('btn_restart'))+' ↻</button></div></div>';
+}
+
+function renderResults(){
+  return isTransitionProfile()?renderTransitionResults():renderNormalResults();
+}
+
+/* ========== MAIN RENDER avec correction UX scroll ========== */
+let _lastScreen=null;
+function render(){
+  let html='';
+  const currentScreen=state.screen;
+  switch(state.screen){
+    case 'welcome':html=renderWelcome();break;
+    case 'context':html=renderContext();break;
+    case 'axes_intro':html=renderAxesIntro();break;
+    case 'axes':html=renderAxisQ();break;
+    case 'int_intro':html=renderIntIntro();break;
+    case 'interests':html=renderIntQ();break;
+    case 'results':html=renderResults();break;
+    default:html=renderWelcome();
+  }
+  const app=document.getElementById('app');
+  const scrollBefore=window.scrollY;
+  app.innerHTML=html;
+  // CORRECTION UX : ne remonte que si on change réellement d'écran
+  if(_lastScreen!==null && _lastScreen!==currentScreen){
+    window.scrollTo({top:0,behavior:'smooth'});
+  } else if(_lastScreen===currentScreen){
+    window.scrollTo({top:scrollBefore,behavior:'instant'});
+  }
+  _lastScreen=currentScreen;
+}
+
+/* ========== NAVIGATION ========== */
+function setLang(l){if(l!=='fr'&&l!=='de')return;state.lang=l;document.documentElement.lang=l;
+  document.getElementById('btn-lang-fr').classList.toggle('active',l==='fr');
+  document.getElementById('btn-lang-de').classList.toggle('active',l==='de');
+  document.getElementById('footer-text').textContent=t('footer');render()}
+function setField(f,v){state.context[f]=v;render()}
+function toggleArr(f,v){
+  if(state.context[f].includes(v)){state.context[f]=state.context[f].filter(x=>x!==v)}
+  else{if(f==='matieres'&&state.context[f].length>=2)return;state.context[f].push(v)}
+  render()
+}
+function setLangueFaible(v){state.context.langueFaible=state.context.langueFaible===v?null:v;render()}
+function validateContext(){
+  const c=state.context;
+  if(!c.niveau||!c.age||!c.region||!c.duree||!c.mobilite||!c.experience||!c.finances||!c.permis)return;
+  state.screen='axes_intro';render();
+}
+function startAxes(){state.axisOrder=shuffle(AXIS_ITEMS.map((_,i)=>i));state.axisCursor=0;state.axisAnswers={};state.screen='axes';render()}
+function answerAxis(v){
+  if(state.screen!=='axes')return;
+  state.axisAnswers[state.axisOrder[state.axisCursor]]=v;
+  if(state.axisCursor<state.axisOrder.length-1){state.axisCursor++;render()}
+  else{computeAxes();state.screen='int_intro';render()}
+}
+function startInt(){state.intOrder=shuffle(ITEMS_INT.map((_,i)=>i));state.intCursor=0;state.intAnswers={};state.screen='interests';render()}
+function answerInt(v){
+  if(state.screen!=='interests')return;
+  state.intAnswers[state.intOrder[state.intCursor]]=v;
+  if(state.intCursor<state.intOrder.length-1){state.intCursor++;render()}
+  else{computeInterests();computeTerritoryScores();state.screen='results';render()}
+}
+function goBack(){
+  if(state.screen==='context'){state.screen='welcome'}
+  else if(state.screen==='axes_intro'){state.screen='context'}
+  else if(state.screen==='axes'){if(state.axisCursor>0){state.axisCursor--}else{state.screen='axes_intro'}}
+  else if(state.screen==='int_intro'){state.screen='axes';state.axisCursor=state.axisOrder.length-1}
+  else if(state.screen==='interests'){if(state.intCursor>0){state.intCursor--}else{state.screen='int_intro'}}
+  render()
+}
+function restart(){
+  _lastScreen=null;
+  state.screen='welcome';state.axisOrder=[];state.axisCursor=0;state.axisAnswers={};
+  state.intOrder=[];state.intCursor=0;state.intAnswers={};
+  state.axisScores={PT:0,DI:0};state.intScores={};state.territoryScores=[];state.showAllTerritories=false;
+  state.context={niveau:null,age:null,region:null,duree:null,mobilite:null,experience:null,finances:null,permis:null,langueFaible:null,languesFortes:[],exclusions:[],skills:[]};
+  render()
+}
+function toggleTerr(){state.showAllTerritories=!state.showAllTerritories;render()}
+
+/* ========== EVENTS ========== */
+document.addEventListener('click',function(e){
+  let tgt=e.target;
+  while(tgt&&tgt!==document){
+    if(tgt.dataset&&tgt.dataset.action){
+      const a=tgt.dataset.action,v=tgt.dataset.value;
+      switch(a){
+        case 'set-lang':setLang(tgt.dataset.lang);break;
+        case 'go-context':state.screen='context';render();break;
+        case 'set-niveau':setField('niveau',v);break;
+        case 'set-age':setField('age',v);break;
+        case 'set-region':setField('region',v);break;
+        case 'set-duree':setField('duree',v);break;
+        case 'set-mobilite':setField('mobilite',v);break;
+        case 'set-experience':setField('experience',v);break;
+        case 'set-finances':setField('finances',v);break;
+        case 'set-permis':setField('permis',v);break;
+        case 'set-langue-faible':setLangueFaible(v);break;
+        case 'toggle-langue-forte':toggleArr('languesFortes',v);break;
+        case 'toggle-exclusion':toggleArr('exclusions',v);break;
+        case 'toggle-skill':toggleArr('skills',v);break;
+        case 'toggle-matiere':toggleArr('matieres',v);break;
+        case 'validate-context':validateContext();break;
+        case 'begin-axes':startAxes();break;
+        case 'answer-axis':answerAxis(parseInt(v,10));break;
+        case 'begin-interests':startInt();break;
+        case 'answer-int':answerInt(parseInt(v,10));break;
+        case 'go-back':goBack();break;
+        case 'restart':restart();break;
+        case 'print':window.print();break;
+        case 'toggle-territories':toggleTerr();break;
+      }
+      return;
+    }
+    tgt=tgt.parentNode;
+  }
+});
+
+document.addEventListener('keydown',function(e){
+  if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
+  if((state.screen==='axes'||state.screen==='interests')&&e.key>='1'&&e.key<='5'){
+    const v=parseInt(e.key,10);
+    if(state.screen==='axes')answerAxis(v);else answerInt(v);
+  } else if(e.key==='Escape'){
+    if(state.screen!=='welcome'&&state.screen!=='results')goBack();
+  }
+});
+
+function init(){
+  document.documentElement.lang='fr';
+  document.getElementById('btn-lang-fr').classList.add('active');
+  document.getElementById('footer-text').textContent=T.fr.footer;
+  render();
+}
+init();
+</script>
+</body>
+</html>
